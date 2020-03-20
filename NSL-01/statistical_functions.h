@@ -1,6 +1,9 @@
-#ifndef __statistical_functions__
-#define __statistical_functions__
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <cmath>
 
- double std_dev(double AV, double AV2, int n);
+using namespace std;
 
-#endif // __statistical_functions__
+double std_dev(double average, double sqrd_average, int sample_number);
+void prog_average_std_dev_block_method(const string& name_output_file, double* average_array, double* sqrd_average_array, int number_blocks);

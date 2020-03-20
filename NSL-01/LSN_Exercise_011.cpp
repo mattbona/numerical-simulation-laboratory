@@ -39,12 +39,6 @@ int main(int argc, char *argv[]){
 	double *random_vec = new double[M]();		// Define random vector
 	double *average = new double[N]();		// Define average vector
 	double *average_sqr = new double[N]();		// Define average squared vector
-	double *prog_average = new double[N]();		// Define progressive average vector
-	double *prog_average_sqr = new double[N]();	// Define progressive average squared vector
-	double *prog_error = new double[N]();		// Define progressive error vector
-
-	ofstream out_file;
-	out_file.open("ex1.dat");
 
 	for(int i=0; i < M; i++){	// Load the vector with random number distributed uniformely
 		random_vec[i] = rnd.Rannyu();
@@ -60,19 +54,7 @@ int main(int argc, char *argv[]){
 		average_sqr[i] = pow(average[i],2);
 	}
 	
-	for(int i=0; i < N; i++){       // Compute and save the progressive average and error over the blocks 
+	prog_average_std_dev_block_method("data/EX011.dat", average, average_sqr, N);	
 
-		for(int j=0; j < i+1; j++){
-			prog_average[i] += average[j];
-			prog_average_sqr[i] += average_sqr[j];
-		}
-
-		prog_average[i] = prog_average[i]/(i+1);
-		prog_average_sqr[i] = prog_average_sqr[i]/(i+1);
-		prog_error[i] = std_dev(prog_average[i],prog_average_sqr[i],i);
-		out_file << prog_average[i] << "\t" << prog_error[i] << endl;
-	}
-
-	out_file.close();
 	return 0;
 }
