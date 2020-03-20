@@ -4,7 +4,7 @@ different statistical function.
 
 LIST of available functions:
 
-- standar_dev;
+- standard deviation;
 - block method for uncertainty;
 
 ###################################*/
@@ -16,6 +16,6 @@ LIST of available functions:
 
 using namespace std;
 
-double error(double AV, double AV2, int n){
+double std_dev(double AV, double AV2, int n){
     return sqrt( ( AV2 - pow(AV,2) )/n );
 };

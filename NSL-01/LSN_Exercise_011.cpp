@@ -3,10 +3,9 @@
 #include <string>
 #include <cmath>
 #include "random.h"
+#include "statistical_functions.h"
 
 using namespace std;
-
-double error(double AV, double AV2, int n);
 
 int main(int argc, char *argv[]){
 	Random rnd;
@@ -68,15 +67,10 @@ int main(int argc, char *argv[]){
 
 		prog_average[i] = prog_average[i]/(i+1);
 		prog_average_sqr[i] = prog_average_sqr[i]/(i+1);
-		prog_error[i] = error(prog_average[i],prog_average_sqr[i],i);
+		prog_error[i] = std_dev(prog_average[i],prog_average_sqr[i],i);
 		out_file << prog_average[i] << "\t" << prog_error[i] << endl;
 	}
 
+	out_file.close();
 	return 0;
 }
-
-//### Functions
-
-double error(double AV, double AV2, int n){
-	return sqrt( ( AV2 - pow(AV,2) )/n );
-};
