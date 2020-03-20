@@ -16,7 +16,7 @@ $(OBJ_DIR)/LSN_Exercise_011.o : LSN_Exercise_011.cpp
 $(OBJ_DIR)/random.o : random.cpp random.h
 	$(CC) -c random.cpp -o $(OBJ_DIR)/random.o $(CFLAGS)
 $(OBJ_DIR)/statistical_functions.o : statistical_functions.cpp statistical_functions.h
-    $(CC) -c statistical_functions.cpp -o $(OBJ_DIR)/statistical_functions.o $(CFLAGS)
+	$(CC) -c statistical_functions.cpp -o $(OBJ_DIR)/statistical_functions.o $(CFLAGS)
 
 
 clean :
