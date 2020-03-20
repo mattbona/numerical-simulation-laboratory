@@ -1,11 +1,21 @@
+## Define Variables
 CC = g++
 CFLAGS = -Wall -O3 --std=c++11
 
-LSN_Exercise_011.exe : LSN_Exercise_011.o random.o
-	$(CC) random.o LSN_Exercise_011.o -o LSN_Exercise_011.exe
-LSN_Exercise_011.o : LSN_Exercise_011.cpp
-	$(CC) -c LSN_Exercise_011.cpp -o LSN_Exercise_011.o $(CFLAGS)
-random.o : random.cpp random.h
-	$(CC) -c random.cpp -o random.o $(CFLAGS)
+## Define path to subdirectories
+OBJ_DIR = OBJ_DIR
+
+## Define the object files needed by the excersises
+OBJ011 = $(OBJ_DIR)/LSN_Exercise_011.o $(OBJ_DIR)/random.o
+
+
+EX011.exe : $(OBJ011)
+	$(CC) $(OBJ011) -o EX011.exe
+$(OBJ_DIR)/LSN_Exercise_011.o : LSN_Exercise_011.cpp
+	$(CC) -c LSN_Exercise_011.cpp -o $(OBJ_DIR)/LSN_Exercise_011.o $(CFLAGS)
+$(OBJ_DIR)/random.o : random.cpp random.h
+	$(CC) -c random.cpp -o $(OBJ_DIR)/random.o $(CFLAGS)
+
+
 clean :
-	rm *.o LSN_Exercise_011.exe seed.out
+	rm $(OBJ_DIR)/*.o EX011.exe
