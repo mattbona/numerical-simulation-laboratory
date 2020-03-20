@@ -13,13 +13,19 @@ LIST of available functions:
 
 double std_dev(double average, double sqrd_average, int sample_number){
 	/*
-	Return the standard deviation normalized 
+	Returns the standard deviation normalized 
 	over the square root of the number of samples. 
 	*/
+
     return sqrt( ( sqrd_average - pow(average,2) )/sample_number );
 };
 
 void prog_average_std_dev_block_method(const string& output_file, double* average_array, double* sqrd_average_array, int number_blocks){
+	/*
+	Prints a file in data/ containing the progressive 
+	average and std-dev of the measures over the 
+	Monte Carlo blocks.
+	*/
 
         ofstream out_file;
         out_file.open(output_file);
