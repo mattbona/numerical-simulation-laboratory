@@ -6,6 +6,7 @@ LIST of available functions:
 
 - standard deviation: std_dev();
 - block method for uncertainty: prog_average_std_dev_block_method();
+- chi squared: chi_sqrd();
 
 ###################################*/
 
@@ -48,4 +49,17 @@ void prog_average_std_dev_block_method(const string& output_file, double* averag
 	}
 	
 	out_file.close();
+};
+
+double chi_sqrd(double* observation_vec, double* expected_value_vec, double* variance_vec, int observation_number){
+	/*
+	Return the chi^2 value of the given data. 
+	*/
+
+	double chi_sqrd = 0;
+	for(int i=0; i< observation_number; i++){
+		chi_sqrd += pow((observation_vec[i] - expected_value_vec[i]),2)/variance_vec[i]; 
+	};
+
+	return chi_sqrd;
 };	
