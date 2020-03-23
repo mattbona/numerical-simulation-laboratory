@@ -40,14 +40,14 @@ int main(int argc, char *argv[]){
 	double *average = new double[N]();		// Define average vector
 	double *average_sqr = new double[N]();		// Define average squared vector
 
-	for(int i=0; i < M; i++){	// Load the vector with random number distributed uniformely
+	for(int i=0; i < M; i++){	// Load the vector with random number distributed uniformly
 		random_vec[i] = rnd.Rannyu();
 	}
 
 	for(int i=0; i < N; i++){       // Compute the average of my observable and the aveˆ2 to calculate the variance
 		double sum = 0;
 		for(int j=0; j < L; j++){
-			int k = i*j + L;
+			int k = j + i*L;
 			sum = sum + random_vec[k];
 		}
 		average[i] = sum/L;
