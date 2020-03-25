@@ -4,6 +4,7 @@
 #include <cmath>
 #include "random.h"
 #include "statistical_functions.h"
+#include "central_limit.h"
 
 using namespace std;
 
@@ -32,15 +33,19 @@ int main(int argc, char *argv[]){
 		input.close();
 	} else cerr << "PROBLEM: Unable to open seed.in" << endl;
 
-
-	int M = 1000000;			// Total number of throws
-	int N = 100;                 		// Number of blocks
-	int L = static_cast<int>(M/N);  	// Number of throws in each block, please use for M a multiple of N
+	// Create and load a vector with M uniformly distr random number 
+	int M = 1000000;			
 	double *random_vec = new double[M]();	// Define random vector
 
-	for(int i=0; i < M; i++){		// Load a vector with random number distributed uniformly
+	for(int i=0; i < M; i++){		// Load the vector
 		random_vec[i] = rnd.Rannyu();
 	}
+
+	int cases = 2;
+	central_limit uniform;
+	uniform.set_uniform_cases(cases);
+
+	cout << uniform.get_uniform_prob() << endl;
 	
 	return 0;
 }
