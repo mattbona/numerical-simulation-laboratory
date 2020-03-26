@@ -33,18 +33,18 @@ int main(int argc, char *argv[]){
 	} else cerr << "PROBLEM: Unable to open seed.in" << endl;
 
 
-	int M = 1000000;			// Total number of throws
-	int N = 100;                 	// Number of blocks
+	int M = 1E8;			// Total number of throws
+	int N = 1E2;                 	// Number of blocks
 	int L = static_cast<int>(M/N);  // Number of throws in each block, please use for M a multiple of N
 	double *random_vec = new double[M]();		// Define random vector
-	double *average1 = new double[N]();		// Define average vector
-	double *average_sqr1 = new double[N]();		// Define average squared vector
 
 	for(int i=0; i < M; i++){	// Load the vector with random number distributed uniformly
 		random_vec[i] = rnd.Rannyu();
 	}
-
+/*
 	// Estimate of <r>
+	double *average1 = new double[N]();		// Define average vector
+	double *average_sqr1 = new double[N]();		// Define average squared vector
 	for(int i=0; i < N; i++){       // Compute the average of my observable and the aveˆ2 to calculate the variance
 		double sum = 0;
 		for(int j=0; j < L; j++){
@@ -72,32 +72,37 @@ int main(int argc, char *argv[]){
          }
  
          prog_average_std_dev_block_method("data/EX011(2).dat", average2, average_sqr2, N);
-
-	// Estimate chi^2 dividing [0,1] in M=10^2 part
+*/
+	// Estimate chi^2 dividing [0,1] in sub-intervals intervals=10^2 part
 	int intervals = 100;
 	double interval_prob = 1./intervals;		// Probability to sit in a specific sub-interval due to uniform distr
-	int throws = static_cast<int>(M/intervals); 	// Throws in each sub-interval	
+	int throws = static_cast<int>(L/intervals); 	// Throws in each sub-interval	
+	
 	double expected_value = throws/intervals;	// Expected value due to uniform distribution
-	double *observations = new double[intervals]();
-
-	for(int i=0; i < intervals; i++){
-		int n_hits = 0;
-		for(int j=0; j < throws ;j++){
-			int k = j + i*throws;
-			if( random_vec[k] >= (0 + i*interval_prob) && random_vec[k] <= (i*interval_prob + interval_prob)){
-				n_hits += 1;
-			}
-		observations[i] = n_hits;
-		}	
-	};
-
 	double *expected_value_vec = new double[intervals]();
 	for(int i=0; i< intervals; i++) expected_value_vec[i] = expected_value;
+	
+	double *observations = new double[intervals]();
+	double *average3 = new double[N]();
+	double *average_sqr3 = new double[N]();
+	
+	for(int t=0; t < N; t++){
 
-	ofstream out_file;
-        out_file.open("data/EX011(3).dat");
-	out_file << chi_sqrd(observations, expected_value_vec, expected_value_vec, intervals);
-	out_file.close();
+		for(int i=0; i < intervals; i++){
+			int n_hits = 0;
+			for(int j=0; j < throws ;j++){
+				int k = j + i*throws + t*throws*N;
+				if( random_vec[k] >= (0 + i*interval_prob) && random_vec[k] <= (i*interval_prob + interval_prob)){
+					n_hits += 1;
+				}
+			observations[i] = n_hits;
+			}	
+		};
+		average3[t] = chi_sqrd(observations, expected_value_vec, expected_value_vec, intervals);
+		average_sqr3[t] = pow( average3[t], 2);
+	};
 
+	prog_average_std_dev_block_method("data/EX011(3).dat", average3, average_sqr3, N);
+	
 	return 0;
 }
