@@ -58,7 +58,7 @@ int main(int argc, char *argv[]){
 	
 	prog_average_std_dev_block_method("data/EX02_1(1).dat", average1, average_sqr1, N);	
 
-         // Estimate of I using importance sampling with w(x)=pi/2*sin(pi/2*x)
+         // Estimate of I using importance sampling with w(x)=3/2*(1-x^2)
          double *average2 = new double[N]();             // Define average vector
          double *average_sqr2 = new double[N]();         // Define average squared vector
  
