@@ -33,8 +33,8 @@ int main(int argc, char *argv[]){
 	} else cerr << "PROBLEM: Unable to open seed.in" << endl;
 
 
-	int M = 1000000;			// Total number of throws
-	int N = 100;                 	// Number of blocks
+	int M = 1E6;			// Total number of throws
+	int N = 1E2;                 	// Number of blocks
 	int L = static_cast<int>(M/N);  // Number of throws in each block, please use for M a multiple of N
 	double *random_vec = new double[M]();		// Define random vector
 
@@ -66,10 +66,11 @@ int main(int argc, char *argv[]){
                  double sum = 0;
                  for(int j=0; j < L; j++){
                          int k = j + i*L;
-                         sum += ( (M_PI)/3 )*( cos(M_PI/2*random_vec[k])/(1 - pow(random_vec[k],2.)) );
+                         sum += ((M_PI/2)*(M_PI-1) )*( cos((M_PI/2)*random_vec[k])/(M_PI - 3*pow(random_vec[k],2.)) );
                  }
                  average2[i] = sum/L;
                  average_sqr2[i] = pow(average2[i],2);
+		 cout << average2[i] << endl;
          }
  
          prog_average_std_dev_block_method("data/EX02_1(2).dat", average2, average_sqr2, N);
