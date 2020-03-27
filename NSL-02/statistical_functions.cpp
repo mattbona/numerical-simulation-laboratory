@@ -18,7 +18,7 @@ double std_dev(double average, double sqrd_average, int sample_number){
 	over the square root of the number of samples. 
 	*/
 
-    return sqrt( ( sqrd_average - pow(average,2) )/sample_number );
+    return sqrt( ( sqrd_average - pow(average,2.) )/sample_number );
 };
 
 void prog_average_std_dev_block_method(const string& output_file, double* average_array, double* sqrd_average_array, int number_blocks){
@@ -43,7 +43,7 @@ void prog_average_std_dev_block_method(const string& output_file, double* averag
 
 		prog_average[i] = prog_average[i]/(i+1);
 		prog_average_sqr[i] = prog_average_sqr[i]/(i+1);
-		prog_error[i] = std_dev(prog_average[i],prog_average_sqr[i],i);
+		prog_error[i] = std_dev(prog_average[i],prog_average_sqr[i],i+1);
 
 		out_file << prog_average[i] << " " << prog_error[i] << endl;
 	}
