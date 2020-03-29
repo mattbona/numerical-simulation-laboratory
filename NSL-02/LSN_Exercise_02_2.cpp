@@ -34,49 +34,45 @@ int main(int argc, char *argv[]){
 		input.close();
 	} else cerr << "PROBLEM: Unable to open seed.in" << endl;
 
-	int M = 1E6;	        		// Total number of throws
-	int N = 1E2;                 	// Number of steps
-	int L = static_cast<int>(M/N);  // Number of repetition for the trajectory, please use for M a multiple of N
-
-    double *coin = new double[M]();
-	for(int i=0; i < M; i++){   // Load the vector used to select forward or backward step with random number distributed uniformly
+    int N = 1E3;                    // Number of steps;
+    int L = 1E4;                    // Number of repetition for the trajectory;
+    int M = L*N;	        	    // Number of random values needed;
+    double *coin = new double[M](); // Define and load a vector with random number distributed uniformly
+	for(int i=0; i < M; i++){       // used to decide if take the step forward or backward;
         coin[i] = rnd.Rannyu();
     }
-    double prob_backw = 0.5;                       // Define the probability of making a step backward
-    int lattice_constant = 1;                      // Define lattice constant
-
-    double *walker_head = new double[3];
-    double* origin = new double[3];
-    origin[0] = 0;
+    double prob_backw = 0.5;        // Define the probability of making a step backward;
+    int lattice_constant = 1;       // Define lattice constant;
+    double *walker_head = new double[3]; // Define the vector containing the xyz coordinate of the head of the walker;
+    double* origin = new double[3];      // Define  load and the vector containing
+    origin[0] = 0;                       // the xyz coordinate of the origin;
     origin[1] = 0;
     origin[2] = 0;
-
     random_walk r_walker;
     r_walker.set_step_lenght(lattice_constant);
     r_walker.set_steps_number(N);
     r_walker.set_prob_backw(prob_backw);
 
     // Estimate of the 3D distance on a cubic lattice done by a RW
-    double *random_vec = new double[M]();		// Define random vector to select xyz direction
-	for(int i=0; i < M; i++){	// Load the vector used to select the direction with random number distributed uniformly
-		random_vec[i] = rnd.Rannyu();
+    double *random_vec = new double[M]();   // Define and load a vector filled with random
+	for(int i=0; i < M; i++){	            // uniformly distributed number used to select
+		random_vec[i] = rnd.Rannyu();       // the xyz direction over which take the step;
 	}
-    double *sum_RW_distance_vec1 = new double[N]();		    // Define average vector
-    double *sum_sqr_RW_distance_vec1 = new double[N]();		    // Define average squared vector
+    double *sum_RW_distance_vec1 = new double[N]();		    // Define a vector containing the sum of all the distances over all trajectories
+    double *sum_sqr_RW_distance_vec1 = new double[N]();		// Define a vector containing the sum of all the square distances over all trajectories
 
-	for(int i=0; i < L; i++){                      // Cycle over the trajectories
-        walker_head[0] = 0;
-        walker_head[1] = 0;
-        walker_head[2] = 0;
-
+	for(int i=0; i < L; i++){      // Cycle over the trajectories
+        walker_head[0] = origin[0];        // The walker will always begin in the origin
+        walker_head[1] = origin[1];
+        walker_head[2] = origin[2];
         r_walker.square_lattice(random_vec, origin, walker_head, i, coin, sum_RW_distance_vec1, sum_sqr_RW_distance_vec1);
     }
 
-    ofstream out_file1;
-    out_file1.open("data/EX02_2(1).dat");
-    for(int j=0; j < N; j++){
+    ofstream out_file1;                     // Open a file on which will be printed the average and the
+    out_file1.open("data/EX02_2(1).dat");   // standard dev. of the distances traveled by the walker on
+    for(int j=0; j < N; j++){               // a square lattice over all the trajectories;
        out_file1 << sum_RW_distance_vec1[j]/L << " " << std_dev(sum_RW_distance_vec1[j]/L,sum_sqr_RW_distance_vec1[j]/L,L) << endl;
-   }
+    }
     out_file1.close();
 /*
     // Estimate of the 3D distance in the continuum done by a RW
