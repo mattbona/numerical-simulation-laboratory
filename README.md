@@ -13,3 +13,4 @@ A GitHub repo complete with the exercises from the 2019-2020 Numerical Simulatio
 		- EX 02.1.2 [no jupyter]
     - EX 02.2
         - EX 02.2.1 [no jupyter]
+        - EX 02.2.2 [no jupyter]
