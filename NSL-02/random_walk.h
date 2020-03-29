@@ -21,8 +21,8 @@ public:
 
   double euclidean_distance(double* pointA, double* pointB);
 
-  void square_lattice(double* random_vec,double* origin, double* walker_head, int repetition, double* coin_toss, double *sum_RW_distance_vec, double *sum_sqr_RW_distance_vec);
-//  void continuum();
+  void square_lattice(double* random_vec, double* origin, double* walker_head, int repetition, double* coin_toss, double *sum_RW_distance_vec, double *sum_sqr_RW_distance_vec);
+  void continuum(double* random_theta_vec, double* random_phi_vec, double* origin, double* walker_head, int repetition, double* coin_toss, double *sum_RW_distance_vec, double *sum_sqr_RW_distance_vec);
 };
 
 #endif // __random_walk__

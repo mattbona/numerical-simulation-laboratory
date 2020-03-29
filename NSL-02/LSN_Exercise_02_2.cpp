@@ -52,7 +52,7 @@ int main(int argc, char *argv[]){
     r_walker.set_step_lenght(lattice_constant);
     r_walker.set_steps_number(N);
     r_walker.set_prob_backw(prob_backw);
-
+/*
     // Estimate of the 3D distance on a cubic lattice done by a RW
     double *random_vec = new double[M]();   // Define and load a vector filled with random
 	for(int i=0; i < M; i++){	            // uniformly distributed number used to select
@@ -74,53 +74,34 @@ int main(int argc, char *argv[]){
        out_file1 << sum_RW_distance_vec1[j]/L << " " << std_dev(sum_RW_distance_vec1[j]/L,sum_sqr_RW_distance_vec1[j]/L,L) << endl;
     }
     out_file1.close();
-/*
+*/
     // Estimate of the 3D distance in the continuum done by a RW
-    double *random_theta_vec = new double[M]();		// Define random vector to select theta direction
-    double theta_min = 0;
-    double theta_max = M_PI;
-	for(int i=0; i < M; i++){	// Load the vector used to select the direction with random number distributed uniformly over [0,pi]
+    double theta_min = 0, theta_max = M_PI;
+    double *random_theta_vec = new double[M]();		// Define and load the vector used to select
+	for(int i=0; i < M; i++){	                    // the theta-direction with random number distributed uniformly over [0,pi];
 		random_theta_vec[i] = rnd.Rannyu()*(theta_max-theta_min) + theta_min;
 	}
-    double *random_phi_vec = new double[M]();		// Define random vector to select phi direction
-    double phi_min = 0;
-    double phi_max = 2*M_PI;
-	for(int i=0; i < M; i++){	// Load the vector used to select the direction with random number distributed uniformly over [0,2pi]
+    double phi_min = 0, phi_max = 2*M_PI;
+    double *random_phi_vec = new double[M]();		// Define and load the vector used to select
+	for(int i=0; i < M; i++){	                    // the phi-direction with random number distributed uniformly over [0,2pi];
 		random_phi_vec[i] = rnd.Rannyu()*(phi_max-phi_min) + phi_min;
 	}
-    double *sum_RW_distance_vec2 = new double[N]();		    // Define average vector
-    double *sum_sqr_RW_distance_vec2 = new double[N]();		// Define average squared vector
+    double *sum_RW_distance_vec2 = new double[N]();		    // Define a vector containing the sum of all the distances over all trajectories
+    double *sum_sqr_RW_distance_vec2 = new double[N]();		// Define a vector containing the sum of all the square distances over all trajectories
 
-    for(int i=0; i < L; i++){                      // Cycle over the trajectories
-        walker_head[0] = 0;
-        walker_head[1] = 0;
-        walker_head[2] = 0;
-        for(int j=0; j < N; j++){                  // Cycle over the steps of one trajectory
-            int k = j + i*N;
-            double RW_distance = 0;
-
-            if(coin[k] <= prob_backw){
-                walker_head[0] += -lattice_constant*sin(random_theta_vec[k])*cos(random_phi_vec[k]);
-                walker_head[1] += -lattice_constant*sin(random_theta_vec[k])*sin(random_phi_vec[k]);
-                walker_head[2] += -lattice_constant*cos(random_theta_vec[k]);
-            } else {
-                walker_head[0] += lattice_constant*sin(random_theta_vec[k])*cos(random_phi_vec[k]);
-                walker_head[1] += lattice_constant*sin(random_theta_vec[k])*sin(random_phi_vec[k]);
-                walker_head[2] += lattice_constant*cos(random_theta_vec[k]);
-            }
-
-            RW_distance = euclidean_distance(origin, walker_head);
-		    sum_RW_distance_vec2[j] += RW_distance;
-		    sum_sqr_RW_distance_vec2[j] += pow(RW_distance,2.);
-        }
+    for(int i=0; i < L; i++){              // Cycle over the trajectories;
+        walker_head[0] = origin[0];        // The walker will always begin in the origin;
+        walker_head[1] = origin[1];
+        walker_head[2] = origin[2];
+        r_walker.continuum(random_theta_vec,random_phi_vec, origin, walker_head, i, coin, sum_RW_distance_vec2, sum_sqr_RW_distance_vec2);
     }
 
-    ofstream out_file2;
-    out_file2.open("data/EX02_2(2).dat");
-    for(int j=0; j < N; j++){
+    ofstream out_file2;                     // Open a file on which will be printed the average and the
+    out_file2.open("data/EX02_2(2).dat");   // standard dev. of the distances traveled by the walker on
+    for(int j=0; j < N; j++){               // a square lattice over all the trajectories;
        out_file2 << sum_RW_distance_vec2[j]/L << " " << std_dev(sum_RW_distance_vec2[j]/L,sum_sqr_RW_distance_vec2[j]/L,L) << endl;
    }
     out_file2.close();
-*/
+
     return 0;
 }
