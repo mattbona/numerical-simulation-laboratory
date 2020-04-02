@@ -4,6 +4,7 @@
 #include <cmath>
 #include "random.h"
 #include "statistical_functions.h"
+#include "asset.h"
 
 using namespace std;
 
@@ -31,19 +32,15 @@ int main(int argc, char *argv[]){
 		}
 		input.close();
 	} else cerr << "PROBLEM: Unable to open seed.in" << endl;
-
-
-	int M = 1E6;			// Total number of throws
-	int N = 1E2;                 	// Number of blocks
-	int L = static_cast<int>(M/N);  // Number of throws in each block, please use for M a multiple of N
-	double *random_vec = new double[M]();		// Define random vector
-
-	for(int i=0; i < M; i++){	// Load the vector with random number distributed uniformly
-		random_vec[i] = rnd.Rannyu();
-	}
-
-	// Estimate of I sampling the uniform distr in [0,1]
-
-
+	
+	// Estimate European call-option and put-option price by sampling directly the final asset price S(T) for a GBM(mu,sigma)
+	double mu=0, sigma=1, asset_t0=100, T=1;
+	double gaussian_var = rnd.Gauss(mu,sigma);	
+	GBM asset(mu,sigma);
+	asset.SetAssetValue(asset_t0);
+	asset.SetGaussianVar(gaussian_var);
+	cout <<"S(0)= " << asset.GetAssetValue() << endl;
+	asset.UpdateAssetValue(T);
+	cout <<"After T = " << T << " S(T) = " << asset.GetAssetValue() << endl;
 	return 0;
 }

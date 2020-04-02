@@ -6,7 +6,7 @@ CFLAGS = -Wall -O3 --std=c++11
 OBJ_DIR = OBJ_DIR
 
 ## Define the object files needed by the excersises
-OBJ03_1 = $(OBJ_DIR)/LSN_Exercise_03_1.o $(OBJ_DIR)/random.o $(OBJ_DIR)/statistical_functions.o
+OBJ03_1 = $(OBJ_DIR)/LSN_Exercise_03_1.o $(OBJ_DIR)/random.o $(OBJ_DIR)/statistical_functions.o $(OBJ_DIR)/asset.o
 
 EX03_1.exe : $(OBJ03_1)
 	$(CC) $(OBJ03_1) -o EX03_1.exe
@@ -17,6 +17,8 @@ $(OBJ_DIR)/random.o : random.cpp random.h
 	$(CC) -c random.cpp -o $(OBJ_DIR)/random.o $(CFLAGS)
 $(OBJ_DIR)/statistical_functions.o : statistical_functions.cpp statistical_functions.h
 	$(CC) -c statistical_functions.cpp -o $(OBJ_DIR)/statistical_functions.o $(CFLAGS)
+$(OBJ_DIR)/asset.o : asset.cpp asset.h
+	$(CC) -c asset.cpp -o $(OBJ_DIR)/asset.o $(CFLAGS)
 
 clean :
 	rm $(OBJ_DIR)/*.o *.exe
