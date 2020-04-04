@@ -49,7 +49,7 @@ int main(int argc, char *argv[]){
     GBM asset(drift,volatility);
     double *random_gauss_vec = new double[tot_random_number]();		// Define random vector
 	for(int i=0; i <  tot_random_number; i++){	// Load the vector with random number distributed uniformly
-		random_gauss_vec[i] = rnd.Gauss(asset.GetDrift(),asset.GetVolatility());
+		random_gauss_vec[i] = rnd.Gauss(0,1);
 	}
 
     European call_european;
