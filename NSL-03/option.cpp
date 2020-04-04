@@ -37,3 +37,12 @@ void European :: UpdateCallOptionProfit(){
         this->SetCallOptionProfit(diff);
     };
 };
+
+void European :: UpdatePutOptionProfit(){
+    double diff = strike_price - asset_price;
+    if (diff <=0 ){
+        this->SetCallOptionProfit(0);
+    } else {
+        this->SetCallOptionProfit(diff);
+    }
+};

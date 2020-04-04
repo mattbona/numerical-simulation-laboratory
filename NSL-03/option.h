@@ -18,7 +18,7 @@ public:
 	double GetCallOptionProfit();
     void SetCallOptionProfit(double my_call_option_profit);
 	virtual void UpdateCallOptionProfit(){};
-//	virtual void UpdateOptionProfitPut(double t){};
+	virtual void UpdatePutOptionProfit(){};
 };
 
 class European : public Option{
@@ -32,9 +32,9 @@ public:
 	~European();
 	// Methods
 	void UpdateCallOptionProfit();
+	void UpdatePutOptionProfit();
     void SetStrikePrice(double my_strike_price);
     void SetAssetPrice(double my_asset_price);
-//	void UpdateOptionProfitPut(double t);
 };
 
 #endif // OPTION_H
