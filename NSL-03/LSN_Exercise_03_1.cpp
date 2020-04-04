@@ -5,6 +5,7 @@
 #include "random.h"
 #include "statistical_functions.h"
 #include "asset.h"
+#include "option.h"
 
 using namespace std;
 
@@ -32,15 +33,45 @@ int main(int argc, char *argv[]){
 		}
 		input.close();
 	} else cerr << "PROBLEM: Unable to open seed.in" << endl;
-	
+
 	// Estimate European call-option and put-option price by sampling directly the final asset price S(T) for a GBM(mu,sigma)
-	double mu=0, sigma=1, asset_t0=100, T=1;
-	double gaussian_var = rnd.Gauss(mu,sigma);	
-	GBM asset(mu,sigma);
-	asset.SetAssetValue(asset_t0);
-	asset.SetGaussianVar(gaussian_var);
-	cout <<"S(0)= " << asset.GetAssetValue() << endl;
-	asset.UpdateAssetValue(T);
-	cout <<"After T = " << T << " S(T) = " << asset.GetAssetValue() << endl;
+
+    int block_number = 1E2;
+    int iteration_per_block = 1E4;
+    int tot_random_nukber = block_number*iteration_per_block;
+
+    double drift=0, volatility=1;
+    GBM asset(drift,volatility);
+    European call_european;
+    double asset_initial_price = 100;
+    double expire_date = 1;
+    double strike_price = 100;
+    call_european.SetStrikePrice(strike_price);
+    double risk_free_rate = 0.1;
+
+    double *random_gauss_vec = new double[tot_random_nukber]();		// Define random vector
+	for(int i=0; i <  tot_random_nukber; i++){	// Load the vector with random number distributed uniformly
+		random_gauss_vec[i] = rnd.Gauss(asset.GetMu(),asset.GetSigma());
+	}
+
+    double *average1 = new double[block_number]();		// Define average vector
+    double *average_sqr1 = new double[block_number]();		// Define average squared vector
+    for(int i=0; i < block_number; i++){       // Compute the average of my observable and the aveˆ2 to calculate the variance
+        double sum = 0;
+        for(int j=0; j < iteration_per_block; j++){
+            int k = j + i*iteration_per_block;
+            asset.SetAssetPrice(asset_initial_price);
+            asset.SetGaussianVar(random_gauss_vec[k]);
+            asset.UpdateAssetPrice(expire_date);
+            call_european.SetAssetPrice(asset.GetAssetPrice());
+            call_european.UpdateCallOptionProfit();
+            sum += exp(-1*risk_free_rate*expire_date)*call_european.GetCallOptionProfit();
+        }
+        average1[i] = sum/iteration_per_block;
+        average_sqr1[i] = pow(average1[i],2);
+    }
+
+    prog_average_std_dev_block_method("data/EX03_1(1).dat", average1, average_sqr1, block_number);
+
 	return 0;
 }
