@@ -35,24 +35,39 @@ int main(int argc, char *argv[]){
 	} else cerr << "PROBLEM: Unable to open seed.in" << endl;
 
 	// Estimate European call-option and put-option price by sampling directly the final asset price S(T) for a GBM(mu,sigma)
-
     int block_number = 1E2;
     int iteration_per_block = 1E4;
-    int tot_random_nukber = block_number*iteration_per_block;
+    int tot_random_number = block_number*iteration_per_block;
 
-    double drift=0, volatility=1;
-    GBM asset(drift,volatility);
-    European call_european;
+    double risk_free_rate = 0.1;
+    double drift = risk_free_rate, volatility = 0.25;
     double asset_initial_price = 100;
     double expire_date = 1;
+    double initial_date = 0;
     double strike_price = 100;
-    call_european.SetStrikePrice(strike_price);
-    double risk_free_rate = 0.1;
 
-    double *random_gauss_vec = new double[tot_random_nukber]();		// Define random vector
-	for(int i=0; i <  tot_random_nukber; i++){	// Load the vector with random number distributed uniformly
-		random_gauss_vec[i] = rnd.Gauss(asset.GetMu(),asset.GetSigma());
+    GBM asset(drift,volatility);
+    double *random_gauss_vec = new double[tot_random_number]();		// Define random vector
+	for(int i=0; i <  tot_random_number; i++){	// Load the vector with random number distributed uniformly
+		random_gauss_vec[i] = rnd.Gauss(asset.GetDrift(),asset.GetVolatility());
 	}
+
+    European call_european;
+    call_european.SetStrikePrice(strike_price);
+
+/*
+double sum=0;
+for(int i=10;i<1E5; i++){
+    asset.SetAssetPrice(asset_initial_price);
+    asset.SetGBMGaussianVar(random_gauss_vec[i]);
+    asset.UpdateAssetPrice(initial_date, expire_date);
+    call_european.SetAssetPrice(asset.GetAssetPrice());
+    call_european.UpdateCallOptionProfit();
+    sum+=exp(-1*risk_free_rate*expire_date)*call_european.GetCallOptionProfit();
+    cout <<"Asset price:\t"<<asset.GetAssetPrice() <<"\tOption price:\t"<<exp(-1*risk_free_rate*expire_date)*call_european.GetCallOptionProfit() << endl;
+};
+    cout<<"Average option price:\t" << sum/1E5 << endl;
+*/
 
     double *average1 = new double[block_number]();		// Define average vector
     double *average_sqr1 = new double[block_number]();		// Define average squared vector
@@ -60,12 +75,14 @@ int main(int argc, char *argv[]){
         double sum = 0;
         for(int j=0; j < iteration_per_block; j++){
             int k = j + i*iteration_per_block;
+            asset.SetGBMGaussianVar(random_gauss_vec[k]);
+
             asset.SetAssetPrice(asset_initial_price);
-            asset.SetGaussianVar(random_gauss_vec[k]);
-            asset.UpdateAssetPrice(expire_date);
+            asset.UpdateAssetPrice(initial_date, expire_date);
             call_european.SetAssetPrice(asset.GetAssetPrice());
             call_european.UpdateCallOptionProfit();
-            sum += exp(-1*risk_free_rate*expire_date)*call_european.GetCallOptionProfit();
+            double option_profit = call_european.GetCallOptionProfit();
+            sum += exp(-1*risk_free_rate*expire_date)*option_profit;
         }
         average1[i] = sum/iteration_per_block;
         average_sqr1[i] = pow(average1[i],2);
