@@ -54,6 +54,8 @@ int main(int argc, char *argv[]){
 
     European call_european;
     call_european.SetStrikePrice(strike_price);
+    European put_european;
+    put_european.SetStrikePrice(strike_price);
 
 /*
 double sum=0;
@@ -61,34 +63,44 @@ for(int i=10;i<1E5; i++){
     asset.SetAssetPrice(asset_initial_price);
     asset.SetGBMGaussianVar(random_gauss_vec[i]);
     asset.UpdateAssetPrice(initial_date, expire_date);
-    call_european.SetAssetPrice(asset.GetAssetPrice());
-    call_european.UpdateCallOptionProfit();
-    sum+=exp(-1*risk_free_rate*expire_date)*call_european.GetCallOptionProfit();
-    cout <<"Asset price:\t"<<asset.GetAssetPrice() <<"\tOption price:\t"<<exp(-1*risk_free_rate*expire_date)*call_european.GetCallOptionProfit() << endl;
+    put_european.SetAssetPrice(asset.GetAssetPrice());
+    put_european.UpdatePutOptionProfit();
+    sum+=exp(-1*risk_free_rate*expire_date)*put_european.GetPutOptionProfit();
+    cout <<"Asset price:\t"<<asset.GetAssetPrice() <<"\tOption price:\t"<<exp(-1*risk_free_rate*expire_date)*put_european.GetPutOptionProfit() << endl;
 };
     cout<<"Average option price:\t" << sum/1E5 << endl;
 */
 
     double *average1 = new double[block_number]();		// Define average vector
     double *average_sqr1 = new double[block_number]();		// Define average squared vector
+    double *average2 = new double[block_number]();		// Define average vector
+    double *average_sqr2 = new double[block_number]();		// Define average squared vector
     for(int i=0; i < block_number; i++){       // Compute the average of my observable and the aveˆ2 to calculate the variance
-        double sum = 0;
+        double sum1 = 0;
+        double sum2 = 0;
         for(int j=0; j < iteration_per_block; j++){
             int k = j + i*iteration_per_block;
             asset.SetGBMGaussianVar(random_gauss_vec[k]);
 
             asset.SetAssetPrice(asset_initial_price);
             asset.UpdateAssetPrice(initial_date, expire_date);
+
             call_european.SetAssetPrice(asset.GetAssetPrice());
             call_european.UpdateCallOptionProfit();
-            double option_profit = call_european.GetCallOptionProfit();
-            sum += exp(-1*risk_free_rate*expire_date)*option_profit;
+            sum1 += exp(-1*risk_free_rate*expire_date)*call_european.GetCallOptionProfit();
+            put_european.SetAssetPrice(asset.GetAssetPrice());
+            put_european.UpdatePutOptionProfit();
+            sum2 += exp(-1*risk_free_rate*expire_date)*put_european.GetPutOptionProfit();
         }
-        average1[i] = sum/iteration_per_block;
+        average1[i] = sum1/iteration_per_block;
         average_sqr1[i] = pow(average1[i],2);
+
+        average2[i] = sum2/iteration_per_block;
+        average_sqr2[i] = pow(average2[i],2);
     }
 
     prog_average_std_dev_block_method("data/EX03_1(1).dat", average1, average_sqr1, block_number);
+    prog_average_std_dev_block_method("data/EX03_1(2).dat", average2, average_sqr2, block_number);
 
 	return 0;
 }

@@ -16,7 +16,10 @@ public:
 	~Option(){};
 	// Methods
 	double GetCallOptionProfit();
+    double GetPutOptionProfit();
     void SetCallOptionProfit(double my_call_option_profit);
+    void SetPutOptionProfit(double my_put_option_profit);
+
 	virtual void UpdateCallOptionProfit(){};
 	virtual void UpdatePutOptionProfit(){};
 };

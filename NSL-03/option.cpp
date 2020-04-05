@@ -14,6 +14,14 @@ void Option :: SetCallOptionProfit(double my_call_option_profit){
     call_option_profit = my_call_option_profit;
 }
 
+double Option :: GetPutOptionProfit(){
+	return put_option_profit;
+};
+
+void Option :: SetPutOptionProfit(double my_put_option_profit){
+    put_option_profit = my_put_option_profit;
+}
+
 European :: European(){
 	asset_price = 0;
     strike_price = 0;
@@ -41,8 +49,8 @@ void European :: UpdateCallOptionProfit(){
 void European :: UpdatePutOptionProfit(){
     double diff = strike_price - asset_price;
     if (diff <=0 ){
-        this->SetCallOptionProfit(0);
+        this->SetPutOptionProfit(0);
     } else {
-        this->SetCallOptionProfit(diff);
+        this->SetPutOptionProfit(diff);
     }
 };
