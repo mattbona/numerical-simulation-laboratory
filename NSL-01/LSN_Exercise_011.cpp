@@ -54,8 +54,8 @@ int main(int argc, char *argv[]){
 		average1[i] = sum/L;
 		average_sqr1[i] = pow(average1[i],2);
 	}
-	
-	prog_average_std_dev_block_method("data/EX011(1).dat", average1, average_sqr1, N);	
+
+	prog_average_std_dev_block_method("results/EX011(1).dat", average1, average_sqr1, N);
 
 	// Estimate of <(sigma_r)^2>
         double *average2 = new double[N]();             // Define average vector
@@ -70,22 +70,22 @@ int main(int argc, char *argv[]){
                  average2[i] = sum/L;
                  average_sqr2[i] = pow(average2[i],2);
          }
- 
-         prog_average_std_dev_block_method("data/EX011(2).dat", average2, average_sqr2, N);
+
+         prog_average_std_dev_block_method("results/EX011(2).dat", average2, average_sqr2, N);
 */
 	// Estimate chi^2 dividing [0,1] in sub-intervals intervals=10^2 part
 	int intervals = 100;
 	double interval_prob = 1./intervals;		// Probability to sit in a specific sub-interval due to uniform distr
-	int throws = static_cast<int>(L/intervals); 	// Throws in each sub-interval	
-	
+	int throws = static_cast<int>(L/intervals); 	// Throws in each sub-interval
+
 	double expected_value = throws/intervals;	// Expected value due to uniform distribution
 	double *expected_value_vec = new double[intervals]();
 	for(int i=0; i< intervals; i++) expected_value_vec[i] = expected_value;
-	
+
 	double *observations = new double[intervals]();
 	double *average3 = new double[N]();
 	double *average_sqr3 = new double[N]();
-	
+
 	for(int t=0; t < N; t++){
 
 		for(int i=0; i < intervals; i++){
@@ -96,13 +96,13 @@ int main(int argc, char *argv[]){
 					n_hits += 1;
 				}
 			observations[i] = n_hits;
-			}	
+			}
 		};
 		average3[t] = chi_sqrd(observations, expected_value_vec, expected_value_vec, intervals);
 		average_sqr3[t] = pow( average3[t], 2);
 	};
 
-	prog_average_std_dev_block_method("data/EX011(3).dat", average3, average_sqr3, N);
-	
+	prog_average_std_dev_block_method("results/EX011(3).dat", average3, average_sqr3, N);
+
 	return 0;
 }
