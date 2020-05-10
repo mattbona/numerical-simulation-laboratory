@@ -29,6 +29,8 @@ public:
   double Rannyu(void);
   double Rannyu(double min, double max);
   double Gauss(double mean, double sigma);
+  double Exponential(double decay_rate);
+  double Cauchy(double width, double mean);
 };
 
 #endif // __Random__

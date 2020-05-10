@@ -37,6 +37,14 @@ double Random :: Gauss(double mean, double sigma) {
    return mean + x * sigma;
 }
 
+double Random :: Exponential(double decay_rate){
+        return -(1/decay_rate)*log(1-Rannyu());
+}
+
+double Random :: Cauchy(double width, double mean){
+        return width*tan(M_PI*(Rannyu()-0.5)) + mean;
+}
+
 double Random :: Rannyu(double min, double max){
    return min+(max-min)*Rannyu();
 }

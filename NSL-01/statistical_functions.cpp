@@ -1,5 +1,5 @@
-/*################################### 
-File containing the implementation of 
+/*###################################
+File containing the implementation of
 different statistical function.
 
 LIST of available functions:
@@ -14,17 +14,19 @@ LIST of available functions:
 
 double std_dev(double average, double sqrd_average, int sample_number){
 	/*
-	Returns the standard deviation normalized 
-	over the square root of the number of samples. 
+	Returns the standard deviation normalized
+	over the square root of the number of samples.
 	*/
-
-    return sqrt( ( sqrd_average - pow(average,2) )/sample_number );
+        if (sample_number == 0){
+                return 0;
+        } else
+                return sqrt( ( sqrd_average - average*average )/sample_number );
 };
 
 void prog_average_std_dev_block_method(const string& output_file, double* average_array, double* sqrd_average_array, int number_blocks){
 	/*
-	Prints a file in data/ containing the progressive 
-	average and std-dev of the measures over the 
+	Prints a file in data/ containing the progressive
+	average and std-dev of the measures over the
 	Monte Carlo blocks.
 	*/
 
@@ -34,7 +36,7 @@ void prog_average_std_dev_block_method(const string& output_file, double* averag
         double *prog_average_sqr = new double[number_blocks]();     // Define progressive average squared vector
         double *prog_error = new double[number_blocks]();           // Define progressive error vector
 
-	for(int i=0; i < number_blocks; i++){ 
+	for(int i=0; i < number_blocks; i++){
 
 		for(int j=0; j < i+1; j++){
         		prog_average[i] += average_array[j];
@@ -47,19 +49,19 @@ void prog_average_std_dev_block_method(const string& output_file, double* averag
 
 		out_file << prog_average[i] << " " << prog_error[i] << endl;
 	}
-	
+
 	out_file.close();
 };
 
 double chi_sqrd(double* observation_vec, double* expected_value_vec, double* variance_vec, int observation_number){
 	/*
-	Return the chi^2 value of the given data. 
+	Return the chi^2 value of the given data.
 	*/
 
 	double chi_sqrd = 0;
 	for(int i=0; i< observation_number; i++){
-		chi_sqrd += pow((observation_vec[i] - expected_value_vec[i]),2)/variance_vec[i]; 
+		chi_sqrd += pow((observation_vec[i] - expected_value_vec[i]),2)/variance_vec[i];
 	};
 
 	return chi_sqrd;
-};	
+};

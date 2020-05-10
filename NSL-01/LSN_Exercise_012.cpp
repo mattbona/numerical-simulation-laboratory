@@ -4,7 +4,6 @@
 #include <cmath>
 #include "random.h"
 #include "statistical_functions.h"
-#include "central_limit.h"
 
 using namespace std;
 
@@ -33,19 +32,35 @@ int main(int argc, char *argv[]){
 		input.close();
 	} else cerr << "PROBLEM: Unable to open seed.in" << endl;
 
-	// Create and load a vector with M uniformly distr random number 
-	int M = 1000000;			
-	double *random_vec = new double[M]();	// Define random vector
+	// Create and load a vector with M uniformly distr random number
+        int M = 1E4;			// Total number of throws
+	int N = 2;
 
-	for(int i=0; i < M; i++){		// Load the vector
-		random_vec[i] = rnd.Rannyu();
+	double exponential_decay_rate = 1;
+        double lorentzian_mean = 0;
+        double lorentzian_width = 1;
+
+        double *average_standard_dice = new double[M]();
+        double *average_exponential_dice = new double[M]();
+        double *average_lorentzian_dice = new double[M]();
+
+        ofstream out_file;
+        out_file.open("results/EX012_N2.dat");
+	for(int i=0; i < M; i++){
+		double sum_standard_dice = 0;
+                double sum_exponential_dice = 0;
+                double sum_lorentzian_dice = 0;
+		for(int j=0; j < N; j++){
+			sum_standard_dice +=  rnd.Rannyu();
+                        sum_exponential_dice += rnd.Exponential(exponential_decay_rate);
+                        sum_lorentzian_dice += rnd.Cauchy(lorentzian_width,lorentzian_mean);
+                }
+		average_standard_dice[i] = sum_standard_dice/N;
+                average_exponential_dice[i] = sum_exponential_dice/N;
+                average_lorentzian_dice[i] = sum_lorentzian_dice/N;
+                out_file << average_standard_dice[i] << " " << average_exponential_dice[i] << " " << average_lorentzian_dice[i] << endl;
 	}
 
-	int cases = 2;
-	central_limit uniform;
-	uniform.set_uniform_cases(cases);
-
-	cout << uniform.get_uniform_prob() << endl;
-	
+        out_file.close();
 	return 0;
 }

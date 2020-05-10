@@ -83,9 +83,9 @@ int main(int argc, char *argv[]){
 	for(int i=0; i< intervals; i++) expected_value_vec[i] = expected_value;
 
 	double *observations = new double[intervals]();
-	double *average3 = new double[N]();
-	double *average_sqr3 = new double[N]();
 
+        ofstream out_file;
+        out_file.open("results/chi_sqrd.dat");
 	for(int t=0; t < N; t++){
 
 		for(int i=0; i < intervals; i++){
@@ -98,11 +98,10 @@ int main(int argc, char *argv[]){
 			observations[i] = n_hits;
 			}
 		};
-		average3[t] = chi_sqrd(observations, expected_value_vec, expected_value_vec, intervals);
-		average_sqr3[t] = pow( average3[t], 2);
+		chi_sqrd = chi_sqrd(observations, expected_value_vec, expected_value_vec, intervals);
+                out_file << chi_sqrd << endl;
 	};
-
-	prog_average_std_dev_block_method("results/EX011(3).dat", average3, average_sqr3, N);
+        out_file.close();
 
 	return 0;
 }
