@@ -15,4 +15,8 @@ A GitHub repo complete with the exercises from the 2019-2020 Numerical Simulatio
 		- EX 02.1.2 
     	- EX 02.2
         	- EX 02.2.1 
-        	- EX 02.2.2 
+        	- EX 02.2.2
+* NSL-03:
+	- EX 03.1
+		- EX 03.1.1
+		- EX 03.1.2 

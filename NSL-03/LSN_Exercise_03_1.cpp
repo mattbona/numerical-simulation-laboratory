@@ -34,7 +34,6 @@ int main(int argc, char *argv[]){
 		input.close();
 	} else cerr << "PROBLEM: Unable to open seed.in" << endl;
 
-	// Estimate European call-option and put-option price by sampling directly the final asset price S(T) for a GBM(mu,sigma)
     int block_number = 1E2;
     int iteration_per_block = 1E4;
     int tot_random_number = block_number*iteration_per_block;
@@ -56,21 +55,9 @@ int main(int argc, char *argv[]){
     call_european.SetStrikePrice(strike_price);
     European put_european;
     put_european.SetStrikePrice(strike_price);
-
 /*
-double sum=0;
-for(int i=10;i<1E5; i++){
-    asset.SetAssetPrice(asset_initial_price);
-    asset.SetGBMGaussianVar(random_gauss_vec[i]);
-    asset.UpdateAssetPrice(initial_date, expire_date);
-    put_european.SetAssetPrice(asset.GetAssetPrice());
-    put_european.UpdatePutOptionProfit();
-    sum+=exp(-1*risk_free_rate*expire_date)*put_european.GetPutOptionProfit();
-    cout <<"Asset price:\t"<<asset.GetAssetPrice() <<"\tOption price:\t"<<exp(-1*risk_free_rate*expire_date)*put_european.GetPutOptionProfit() << endl;
-};
-    cout<<"Average option price:\t" << sum/1E5 << endl;
-*/
-
+    // Estimate European call-option and put-option price by
+    // sampling directly the final asset price S(T) for a GBM(mu,sigma)
     double *average1 = new double[block_number]();		// Define average vector
     double *average_sqr1 = new double[block_number]();		// Define average squared vector
     double *average2 = new double[block_number]();		// Define average vector
@@ -81,7 +68,6 @@ for(int i=10;i<1E5; i++){
         for(int j=0; j < iteration_per_block; j++){
             int k = j + i*iteration_per_block;
             asset.SetGBMGaussianVar(random_gauss_vec[k]);
-
             asset.SetAssetPrice(asset_initial_price);
             asset.UpdateAssetPrice(initial_date, expire_date);
 
@@ -99,8 +85,43 @@ for(int i=10;i<1E5; i++){
         average_sqr2[i] = pow(average2[i],2);
     }
 
-    prog_average_std_dev_block_method("data/EX03_1(1).dat", average1, average_sqr1, block_number);
-    prog_average_std_dev_block_method("data/EX03_1(2).dat", average2, average_sqr2, block_number);
+    prog_average_std_dev_block_method("results/EX03_1(1).dat", average1, average_sqr1, block_number);
+    prog_average_std_dev_block_method("results/EX03_1(2).dat", average2, average_sqr2, block_number);
+*/
+    // Estimate European call-option and put-option price by
+    // sampling the discretized GBM(mu,sigma) path of the asset strike_price
 
-	return 0;
+    int number_of_step_GBM = 100;
+    double *average3 = new double[block_number]();		// Define average vector
+    double *average_sqr3 = new double[block_number]();		// Define average squared vector
+    double *average4 = new double[block_number]();		// Define average vector
+    double *average_sqr4 = new double[block_number]();		// Define average squared vector
+    for(int i=0; i < block_number; i++){       // Compute the average of my observable and the aveˆ2 to calculate the variance
+        double sum1 = 0;
+        double sum2 = 0;
+        for(int j=0; j < iteration_per_block; j++){
+                asset.SetAssetPrice(asset_initial_price);
+                for(int l=0; l< number_of_step_GBM; l++){
+                        asset.SetGBMGaussianVar(rnd.Gauss(0,1));
+                        asset.UpdateAssetPrice(double(l)/number_of_step_GBM, double(l+1)/number_of_step_GBM);
+                }
+
+                call_european.SetAssetPrice(asset.GetAssetPrice());
+                call_european.UpdateCallOptionProfit();
+                sum1 += exp(-1*risk_free_rate*expire_date)*call_european.GetCallOptionProfit();
+                put_european.SetAssetPrice(asset.GetAssetPrice());
+                put_european.UpdatePutOptionProfit();
+                sum2 += exp(-1*risk_free_rate*expire_date)*put_european.GetPutOptionProfit();
+        }
+        average3[i] = sum1/iteration_per_block;
+        average_sqr3[i] = pow(average3[i],2);
+
+        average4[i] = sum2/iteration_per_block;
+        average_sqr4[i] = pow(average4[i],2);
+    }
+
+    prog_average_std_dev_block_method("results/EX03_1(3).dat", average3, average_sqr3, block_number);
+    prog_average_std_dev_block_method("results/EX03_1(4).dat", average4, average_sqr4, block_number);
+
+    return 0;
 }
