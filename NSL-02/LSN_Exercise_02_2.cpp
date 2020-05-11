@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
 		input.close();
 	} else cerr << "PROBLEM: Unable to open seed.in" << endl;
 
-    int N = 1E3;                    // Number of steps;
+    int N = 1E2;                    // Number of steps;
     int L = 1E4;                    // Number of repetition for the trajectory;
     int M = L*N;	        	    // Number of random values needed;
     double *coin = new double[M](); // Define and load a vector with random number distributed uniformly
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]){
     r_walker.set_step_lenght(lattice_constant);
     r_walker.set_steps_number(N);
     r_walker.set_prob_backw(prob_backw);
-/*
+
     // Estimate of the 3D distance on a cubic lattice done by a RW
     double *random_vec = new double[M]();   // Define and load a vector filled with random
 	for(int i=0; i < M; i++){	            // uniformly distributed number used to select
@@ -69,12 +69,12 @@ int main(int argc, char *argv[]){
     }
 
     ofstream out_file1;                     // Open a file on which will be printed the average and the
-    out_file1.open("data/EX02_2(1).dat");   // standard dev. of the distances traveled by the walker on
+    out_file1.open("results/EX02_2(1).dat");   // standard dev. of the distances traveled by the walker on
     for(int j=0; j < N; j++){               // a square lattice over all the trajectories;
        out_file1 << sum_RW_distance_vec1[j]/L << " " << std_dev(sum_RW_distance_vec1[j]/L,sum_sqr_RW_distance_vec1[j]/L,L) << endl;
     }
     out_file1.close();
-*/
+/*
     // Estimate of the 3D distance in the continuum done by a RW
     double theta_min = 0, theta_max = M_PI;
     double *random_theta_vec = new double[M]();		// Define and load the vector used to select
@@ -97,11 +97,11 @@ int main(int argc, char *argv[]){
     }
 
     ofstream out_file2;                     // Open a file on which will be printed the average and the
-    out_file2.open("data/EX02_2(2).dat");   // standard dev. of the distances traveled by the walker on
+    out_file2.open("results/EX02_2(2).dat");   // standard dev. of the distances traveled by the walker on
     for(int j=0; j < N; j++){               // a square lattice over all the trajectories;
        out_file2 << sum_RW_distance_vec2[j]/L << " " << std_dev(sum_RW_distance_vec2[j]/L,sum_sqr_RW_distance_vec2[j]/L,L) << endl;
    }
     out_file2.close();
-
+*/
     return 0;
 }
