@@ -3,7 +3,7 @@ CC = g++
 CFLAGS = -Wall -O3 --std=c++11
 
 ## Define path to subdirectories
-OBJ_DIR = OBJ_DIR
+OBJ_DIR = object_files_dir
 
 ## Define the object files needed by the excersises
 OBJ02_1 = $(OBJ_DIR)/LSN_Exercise_02_1.o $(OBJ_DIR)/random.o $(OBJ_DIR)/statistical_functions.o

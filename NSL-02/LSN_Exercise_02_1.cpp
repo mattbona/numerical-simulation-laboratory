@@ -41,11 +41,11 @@ int main(int argc, char *argv[]){
 	for(int i=0; i < M; i++){	// Load the vector with random number distributed uniformly
 		random_vec[i] = rnd.Rannyu();
 	}
-
+/*
 	// Estimate of I sampling the uniform distr in [0,1]
 	double *average1 = new double[N]();		// Define average vector
 	double *average_sqr1 = new double[N]();		// Define average squared vector
-	
+
 	for(int i=0; i < N; i++){       // Compute the average of my observable and the aveˆ2 to calculate the variance
 		double sum = 0;
 		for(int j=0; j < L; j++){
@@ -55,25 +55,26 @@ int main(int argc, char *argv[]){
 		average1[i] = sum/L;
 		average_sqr1[i] = pow(average1[i],2);
 	}
-	
-	prog_average_std_dev_block_method("data/EX02_1(1).dat", average1, average_sqr1, N);	
 
-         // Estimate of I using importance sampling with w(x)=3/2*(1-x^2)
+	prog_average_std_dev_block_method("results/EX02_1(1).dat", average1, average_sqr1, N);
+*/
+         // Estimate of I using importance sampling with w(x)=2*(1-x)
          double *average2 = new double[N]();             // Define average vector
          double *average_sqr2 = new double[N]();         // Define average squared vector
- 
+
          for(int i=0; i < N; i++){       // Compute the average of my observable and the aveˆ2 to calculate the variance
                  double sum = 0;
                  for(int j=0; j < L; j++){
                          int k = j + i*L;
-                         sum += ((M_PI/2)*(M_PI-1) )*( cos((M_PI/2)*random_vec[k])/(M_PI - 3*pow(random_vec[k],2.)) );
+                         double importance_x = 1 - sqrt(1-random_vec[k]);
+                         sum += M_PI/4*cos(M_PI/2*importance_x)/(1-importance_x);
                  }
                  average2[i] = sum/L;
                  average_sqr2[i] = pow(average2[i],2);
 		 cout << average2[i] << endl;
          }
- 
-         prog_average_std_dev_block_method("data/EX02_1(2).dat", average2, average_sqr2, N);
+
+         prog_average_std_dev_block_method("results/EX02_1(2).dat", average2, average_sqr2, N);
 
 
 	return 0;
