@@ -27,7 +27,19 @@ double energy,temp,vol,rho,box,rcut;
 
 // simulation
 int nstep, iprint, seed;
+int nblocks = 100;
 double delta;
+
+//Prepare array for blocking method
+double *av_Epot  = new double[nblocks]();
+double *av_EKin  = new double[nblocks]();
+double *av_Etot  = new double[nblocks]();
+double *av_Temp  = new double[nblocks]();
+
+double *av2_Epot  = new double[nblocks]();
+double *av2_EKin  = new double[nblocks]();
+double *av2_Etot  = new double[nblocks]();
+double *av2_Temp  = new double[nblocks]();
 
 //equilibration
 bool restart;
@@ -38,7 +50,7 @@ void Input(void);
 void Move(void);
 void ConfFinal(void);
 void ConfXYZ(int);
-void Measure(void);
+void Measure(int);
 double Force(int, int);
 double Pbc(double);
 /****************************************************************

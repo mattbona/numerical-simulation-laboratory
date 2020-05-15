@@ -12,6 +12,7 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 #include <fstream>      // Stream class to both read and write from/to files.
 #include <cmath>        // rint, pow
 #include "MolDyn_NVE.h"
+#include "statistical_functions.h"
 
 using namespace std;
 
@@ -22,22 +23,39 @@ int main(){
   for(int i=0; i<eqsteps; ++i)
       Move();
 
-  int nconf = 1;
+//  int nconf = 1;
+  int steps_per_block = int(nstep/nblocks);
   cout << "Start the simulation..." << endl;
-  for(int istep=1; istep <= nstep; ++istep){
-     Move();           //Move particles with Verlet algorithm
-     if(istep%iprint == 0) cout << "Number of time-steps: " << istep << endl;
-     if(istep%10 == 0){
-        Measure();     //Properties measurement
-//        ConfXYZ(nconf);//Write actual configuration in XYZ format //Commented to avoid "filesystem full"!
-        nconf += 1;
-     }
+  for(int iblock=0; iblock <= nblocks ; ++iblock){
+      if(iblock%10 == 0) cout << "Number of block: " << iblock << endl;
+      for(int istep=1; istep <=steps_per_block; ++istep){
+         Move();           //Move particles with Verlet algorithm
+         if(istep%10 == 0){
+            Measure(iblock);     //Properties measurement
+//            ConfXYZ(nconf);//Write actual configuration in XYZ format //Commented to avoid "filesystem full"!
+//            nconf += 1;
+         }
+      }
+      av_Epot[iblock] /= steps_per_block/10;
+      av_EKin[iblock] /= steps_per_block/10;
+      av_Etot[iblock] /= steps_per_block/10;
+      av_Temp[iblock] /= steps_per_block/10;
+      av2_Epot[iblock] += av_Epot[iblock]*av_Epot[iblock];
+      av2_EKin[iblock] += av_EKin[iblock]*av_EKin[iblock];
+      av2_Etot[iblock] += av_Etot[iblock]*av_Etot[iblock];
+      av2_Temp[iblock] += av_Temp[iblock]*av_Temp[iblock];
+
   }
+
+  prog_average_std_dev_block_method("results/e_pot.dat", av_Epot, av2_Epot, nblocks);
+  prog_average_std_dev_block_method("results/e_kin.dat", av_EKin, av2_EKin, nblocks);
+  prog_average_std_dev_block_method("results/e_tot.dat", av_Etot, av2_Etot, nblocks);
+  prog_average_std_dev_block_method("results/temp.dat", av_Temp, av2_Temp, nblocks);
+
   ConfFinal();         //Write final configuration to restart
 
   return 0;
 }
-
 
 void Input(void){ //Prepare all stuff for the simulation
   ifstream ReadInput,ReadConf;
@@ -227,16 +245,10 @@ double Force(int ip, int idir){ //Compute forces as -Grad_ip V(r)
   return f;
 }
 
-void Measure(){ //Properties measurement
+void Measure(int iblock){ //Properties measurement
   int bin;
   double v, t, vij;
   double dx, dy, dz, dr;
-  ofstream Epot, Ekin, Etot, Temp;
-
-  Epot.open("output_epot.dat",ios::app);
-  Ekin.open("output_ekin.dat",ios::app);
-  Temp.open("output_temp.dat",ios::app);
-  Etot.open("output_etot.dat",ios::app);
 
   v = 0.0; //reset observables
   t = 0.0;
@@ -269,15 +281,10 @@ void Measure(){ //Properties measurement
     stima_temp = (2.0 / 3.0) * t/(double)npart; //Temperature
     stima_etot = (t+v)/(double)npart; //Total energy per particle
 
-    Epot << stima_pot  << endl;
-    Ekin << stima_kin  << endl;
-    Temp << stima_temp << endl;
-    Etot << stima_etot << endl;
-
-    Epot.close();
-    Ekin.close();
-    Temp.close();
-    Etot.close();
+    av_Epot[iblock] += stima_pot;
+    av_EKin[iblock] += stima_kin;
+    av_Etot[iblock] += stima_etot;
+    av_Temp[iblock] += stima_temp;
 
     return;
 }
