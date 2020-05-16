@@ -40,17 +40,19 @@ int main(){
       av_EKin[iblock] /= steps_per_block/10;
       av_Etot[iblock] /= steps_per_block/10;
       av_Temp[iblock] /= steps_per_block/10;
+      av_Pres[iblock] /= steps_per_block/10;
       av2_Epot[iblock] += av_Epot[iblock]*av_Epot[iblock];
       av2_EKin[iblock] += av_EKin[iblock]*av_EKin[iblock];
       av2_Etot[iblock] += av_Etot[iblock]*av_Etot[iblock];
       av2_Temp[iblock] += av_Temp[iblock]*av_Temp[iblock];
-
+      av2_Pres[iblock] += av_Pres[iblock]*av_Pres[iblock];
   }
 
-  prog_average_std_dev_block_method("results/e_pot.dat", av_Epot, av2_Epot, nblocks);
-  prog_average_std_dev_block_method("results/e_kin.dat", av_EKin, av2_EKin, nblocks);
-  prog_average_std_dev_block_method("results/e_tot.dat", av_Etot, av2_Etot, nblocks);
-  prog_average_std_dev_block_method("results/temp.dat", av_Temp, av2_Temp, nblocks);
+  prog_average_std_dev_block_method("results/gas/e_pot.dat", av_Epot, av2_Epot, nblocks);
+  prog_average_std_dev_block_method("results/gas/e_kin.dat", av_EKin, av2_EKin, nblocks);
+  prog_average_std_dev_block_method("results/gas/e_tot.dat", av_Etot, av2_Etot, nblocks);
+  prog_average_std_dev_block_method("results/gas/temp.dat", av_Temp, av2_Temp, nblocks);
+  prog_average_std_dev_block_method("results/gas/pres.dat", av_Temp, av2_Temp, nblocks);
 
   ConfFinal();         //Write final configuration to restart
 
@@ -59,7 +61,6 @@ int main(){
 
 void Input(void){ //Prepare all stuff for the simulation
   ifstream ReadInput,ReadConf;
-  double ep, ek, pr, et, vir;
 
   cout << "Classic Lennard-Jones fluid        " << endl;
   cout << "Molecular dynamics simulation in NVE ensemble  " << endl << endl;
@@ -246,11 +247,18 @@ double Force(int ip, int idir){ //Compute forces as -Grad_ip V(r)
 }
 
 void Measure(int iblock){ //Properties measurement
-  int bin;
-  double v, t, vij;
+  double v, w, t, vij, wij;
   double dx, dy, dz, dr;
+  ofstream Epot, Ekin, Etot, Temp, Pres;
+
+  Epot.open("results/output_epot.dat",ios::app);
+  Ekin.open("results/output_ekin.dat",ios::app);
+  Temp.open("results/output_temp.dat",ios::app);
+  Etot.open("results/output_etot.dat",ios::app);
+  Pres.open("results/output_pres.dat",ios::app);
 
   v = 0.0; //reset observables
+  w = 0.0;
   t = 0.0;
 
 //cycle over pairs of particles
@@ -266,9 +274,13 @@ void Measure(int iblock){ //Properties measurement
 
      if(dr < rcut){
        vij = 4.0/pow(dr,12) - 4.0/pow(dr,6);
+       wij = 1.0/pow(dr,12) - 0.5/pow(dr,6);
+
 
 //Potential energy
        v += vij;
+       w += wij;
+
      }
     }
   }
@@ -280,11 +292,25 @@ void Measure(int iblock){ //Properties measurement
     stima_kin = t/(double)npart; //Kinetic energy per particle
     stima_temp = (2.0 / 3.0) * t/(double)npart; //Temperature
     stima_etot = (t+v)/(double)npart; //Total energy per particle
+    stima_pres = rho * stima_temp + 48.0 * w / (3.0 * vol); //Pressure
 
     av_Epot[iblock] += stima_pot;
     av_EKin[iblock] += stima_kin;
     av_Etot[iblock] += stima_etot;
     av_Temp[iblock] += stima_temp;
+    av_Pres[iblock] += stima_pres;
+
+    Epot << stima_pot  << endl;
+    Ekin << stima_kin  << endl;
+    Temp << stima_temp << endl;
+    Etot << stima_etot << endl;
+    Pres << stima_pres << endl;
+
+    Epot.close();
+    Ekin.close();
+    Temp.close();
+    Etot.close();
+    Pres.close();
 
     return;
 }

@@ -11,7 +11,7 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 const int m_props=4;
 int n_props;
 int iv,ik,it,ie;
-double stima_pot, stima_kin, stima_etot, stima_temp;
+double stima_pot, stima_kin, stima_etot, stima_temp,stima_pres;
 
 // averages
 double acc,att;
@@ -35,11 +35,13 @@ double *av_Epot  = new double[nblocks]();
 double *av_EKin  = new double[nblocks]();
 double *av_Etot  = new double[nblocks]();
 double *av_Temp  = new double[nblocks]();
+double *av_Pres  = new double[nblocks]();
 
 double *av2_Epot  = new double[nblocks]();
 double *av2_EKin  = new double[nblocks]();
 double *av2_Etot  = new double[nblocks]();
 double *av2_Temp  = new double[nblocks]();
+double *av2_Pres  = new double[nblocks]();
 
 //equilibration
 bool restart;
