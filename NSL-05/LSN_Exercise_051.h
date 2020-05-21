@@ -20,7 +20,7 @@ int blocks_number = 1E2;
 int steps_per_block = 1E4;
 int samples_total_number = blocks_number*steps_per_block;
 int equilibration_steps = 1E2;
-bool uniform=0, state_100=0, state_210=0;
+bool uniform=0, gauss=0, state_100=0, state_210=0;
 
 // Blocks statistics
 double *average_radius = new double[blocks_number]();
@@ -34,6 +34,7 @@ void compute_average_radius_210_state(void);
 void test_start_far_from_origin(void);
 void move(void);
 void make_uniform_step(void);
+void make_gaussian_step(void);
 void equilibrate(void);
 void set_random_walk_head(double my_x,double my_y,double my_z);
 double get_probability_amplitude_100_state(double my_x,double my_y,double my_z);

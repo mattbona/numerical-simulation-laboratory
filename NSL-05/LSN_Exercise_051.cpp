@@ -14,8 +14,8 @@ int main(int argc, char *argv[]){
     set_seed_with_primes(); // Set the seed of the random generator according to Primes file
 
 //    compute_average_radius_100_state();
-//    compute_average_radius_210_state();
-    test_start_far_from_origin();
+    compute_average_radius_210_state();
+//    test_start_far_from_origin();
 
 	return 0;
 }
@@ -34,10 +34,12 @@ void input(void){
     ReadInput >> steps_per_block;
     ReadInput >> equilibration_steps;
     ReadInput >> uniform;
+    ReadInput >> gauss;
 
     ReadInput.close();
 
-    if (uniform) cout << "The program perform Metropolis moves with uniform translations" << endl;
+    if (uniform) cout << "The program perform Metropolis moves with uniform translations." << endl;
+    if (gauss) cout << "The program perform Metropolis moves with gaussian translations." << endl;
     cout << "Random step amplitude = " << delta << endl;
     cout << "Number of blocks = " << blocks_number << endl;
     cout << "Number of steps in one block = " << steps_per_block << endl << endl;
@@ -71,6 +73,8 @@ void set_seed_with_primes(void){
 
 void compute_average_radius_100_state(void){
     cout << "Computing the average radius of the (1,0,0) state" << endl;
+    ofstream outfile;
+    outfile.open("results/sampled_points_100_state.dat");
     state_100 = 1;
     for(int iblock=0; iblock < blocks_number; iblock++){
         if(iblock%10==0) cout << "Block number: " << iblock << endl;
@@ -83,6 +87,7 @@ void compute_average_radius_100_state(void){
         for(int ithrow=0; ithrow < steps_per_block; ithrow++){
             move();
             sum_radius += sqrt(x_current*x_current + y_current*y_current + z_current*z_current);
+            outfile << x_current << " " << y_current << " " << z_current << endl;
         }
 
         average_radius[iblock] = sum_radius/steps_per_block;
@@ -90,12 +95,15 @@ void compute_average_radius_100_state(void){
         if(iblock%10==0) cout << "Block acceptance rate: " <<  acceptance_rate/steps_per_block << endl << endl;
     }
 
-    prog_average_std_dev_block_method("results/average_radius_100_state.dat",
+    prog_average_std_dev_block_method("results/average_radius_100_state_gauss.dat",
         average_radius, average_radius2, blocks_number);
+    outfile.close();
 };
 
 void compute_average_radius_210_state(void){
     cout << "Computing the average radius of the (2,1,0) state" << endl;
+    ofstream outfile;
+    outfile.open("results/sampled_points_210_state.dat");
     state_210 = 1;
     for(int iblock=0; iblock < blocks_number; iblock++){
         if(iblock%10==0) cout << "Block number: " << iblock << endl;
@@ -108,6 +116,7 @@ void compute_average_radius_210_state(void){
         for(int ithrow=0; ithrow < steps_per_block; ithrow++){
             move();
             sum_radius += sqrt(x_current*x_current + y_current*y_current + z_current*z_current);
+            outfile << x_current << " " << y_current << " " << z_current << endl;
         }
 
         average_radius[iblock] = sum_radius/steps_per_block;
@@ -115,13 +124,14 @@ void compute_average_radius_210_state(void){
         if(iblock%10==0) cout << "Block acceptance rate: " <<  acceptance_rate/steps_per_block << endl << endl;
     }
 
-    prog_average_std_dev_block_method("results/average_radius_210_state.dat",
+    prog_average_std_dev_block_method("results/average_radius_210_state_gauss.dat",
         average_radius, average_radius2, blocks_number);
-
+    outfile.close();
 };
 
 void test_start_far_from_origin(void){
     cout << "Testing what happens when starting the random walk far from the origin." << endl;
+    // Change file name, starting point and state according to what you need!
     ofstream out;
     out.open("results/test_start_near_from_origin_210_state.dat");
 
@@ -155,6 +165,7 @@ void move(void){
         get_probability_amplitude_210_state(x_current, y_current, z_current);
 
     if (uniform) make_uniform_step();
+    if (gauss) make_gaussian_step();
 
     if(state_100) new_probability_amplitude =
         get_probability_amplitude_100_state(x_new, y_new, z_new);
@@ -186,6 +197,12 @@ void make_uniform_step(void){
     x_new = x_current + delta*(rnd.Rannyu() - 0.5);
     y_new = y_current + delta*(rnd.Rannyu() - 0.5);
     z_new = z_current + delta*(rnd.Rannyu() - 0.5);
+};
+
+void make_gaussian_step(void){
+    x_new = x_current + rnd.Gauss(0,delta);
+    y_new = y_current + rnd.Gauss(0,delta);
+    z_new = z_current + rnd.Gauss(0,delta);
 };
 
 double get_acceptance(double prob_current, double prob_new){
