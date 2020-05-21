@@ -14,7 +14,8 @@ int main(int argc, char *argv[]){
     set_seed_with_primes(); // Set the seed of the random generator according to Primes file
 
 //    compute_average_radius_100_state();
-    compute_average_radius_210_state();
+//    compute_average_radius_210_state();
+    test_start_far_from_origin();
 
 	return 0;
 }
@@ -119,6 +120,19 @@ void compute_average_radius_210_state(void){
 
 };
 
+void test_start_far_from_origin(void){
+    cout << "Testing what happens when starting the random walk far from the origin." << endl;
+    ofstream out;
+    out.open("results/test_start_near_from_origin_210_state.dat");
+
+    set_random_walk_head(1, 1, 1);
+    state_210 = 1;
+    for(int istep=0; istep< steps_per_block; istep++){
+        move();
+        out << sqrt(x_current*x_current + y_current*y_current + z_current*z_current) << endl;
+    }
+    out.close();
+};
 
 void set_random_walk_head(double my_x,double my_y,double my_z){
     x_current = my_x;

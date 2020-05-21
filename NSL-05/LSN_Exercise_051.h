@@ -31,6 +31,7 @@ void input(void);
 void set_seed_with_primes(void);
 void compute_average_radius_100_state(void);
 void compute_average_radius_210_state(void);
+void test_start_far_from_origin(void);
 void move(void);
 void make_uniform_step(void);
 void equilibrate(void);
