@@ -37,11 +37,12 @@ int nspin;
 double beta,temp,J,h;
 
 // simulation
-int nstep, nblk, metro;
+int nstep, neqstep, nblk, metro;
 bool restart;
 
 //functions
 void Input(void);
+void Equilibration(void);
 void Reset(int);
 void Accumulate(void);
 void Averages(int);

@@ -20,6 +20,7 @@ using namespace std;
 int main()
 {
   Input(); //Inizialization
+  Equilibration(); // Equilibration
   for(int iblk=1; iblk <= nblk; ++iblk) //Simulation
   {
     Reset(iblk);   //Reset block averages
@@ -77,15 +78,16 @@ void Input(void)
   ReadInput >> metro; // if=1 Metropolis else Gibbs
   ReadInput >> nblk;
   ReadInput >> nstep;
+  ReadInput >> neqstep;
 
   if(metro==1) cout << "The program perform Metropolis moves" << endl;
   else cout << "The program perform Gibbs moves" << endl;
   cout << "Number of blocks = " << nblk << endl;
-  cout << "Number of steps in one block = " << nstep << endl << endl;
+  cout << "Number of steps in one block = " << nstep << endl;
+  cout << "Number of equilibration steps = " << neqstep << endl << endl;
 
   ReadInput >> restart; // if=1 will restart from a configuration
   ReadInput.close();
-
 
 //Prepare arrays for measurements
   iu = 0; //Energy
@@ -120,7 +122,11 @@ void Input(void)
   cout << "Initial energy = " << walker[iu]/(double)nspin << endl;
 }
 
-
+void Equilibration(void){
+    for (int ieqstep=0; ieqstep < neqstep; ieqstep++){
+        Move(metro);
+    }
+}
 void Move(int metro)
 {
   int o;
@@ -218,6 +224,7 @@ void Averages(int iblk) //Print results for current block
 {
 
    ofstream Ene, Heat, Mag, Chi;
+   ofstream Ene_T, Heat_T, Mag_T, Chi_T;
    const int wd=12;
 
     cout << "Block number " << iblk << endl;
@@ -230,6 +237,12 @@ void Averages(int iblk) //Print results for current block
     err_u=Error(glob_av[iu],glob_av2[iu],iblk);
     Ene << setw(wd) << iblk <<  setw(wd) << stima_u << setw(wd) << glob_av[iu]/(double)iblk << setw(wd) << err_u << endl;
     Ene.close();
+
+    if(iblk==nblk){
+        Ene_T.open("results/energy_vs_temperature.dat",ios::app);
+        Ene_T << temp << " " << glob_av[iu]/(double)iblk << " " << err_u << endl;
+        Ene_T.close();
+    }
 
 // INCLUDE YOUR CODE HERE
 
