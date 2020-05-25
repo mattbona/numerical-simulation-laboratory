@@ -8,6 +8,13 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 *****************************************************************
 *****************************************************************/
 
+/*
+If you want to use this code to compute the various observables in function
+of the temperature in a certain range, use the bash script `observables_vs_temperature.sh`
+and make sure to modify the first row of the `input.dat` file with the string `TEMPERATURE`
+and to specify the temperatures to simulate in the file `temperatures.dat`.
+*/
+
 #include <iostream>
 #include <fstream>
 #include <ostream>
@@ -123,6 +130,7 @@ void Input(void)
 }
 
 void Equilibration(void){
+    cout << "Equilibration..." << endl;
     for (int ieqstep=0; ieqstep < neqstep; ieqstep++){
         Move(metro);
     }
@@ -156,7 +164,7 @@ void Move(int metro)
     }
     else //Gibbs sampling
     {
-        probability_up = 1/(1 + exp(-2 * beta * J * (s[Pbc(o-1)] + s[Pbc(o+1)] ) ) );
+        probability_up = 1/(1 + exp(-2 * beta *( J * (s[Pbc(o-1)] + s[Pbc(o+1)] ) + h ) ) );
         double r = rnd.Rannyu();
         if (r <= probability_up) s[o] = +1;
         else s[o] = -1;
@@ -175,17 +183,19 @@ double Boltzmann(int sm, int ip)
 void Measure()
 {
   double u = 0.0;
+  double m = 0.0;
 
 //cycle over spins
   for (int i=0; i<nspin; ++i)
   {
      u += -J * s[i] * s[Pbc(i+1)] - 0.5 * h * (s[i] + s[Pbc(i+1)]);
-// INCLUDE YOUR CODE HERE
+     m += s[i];
   }
   walker[iu] = u;
-// INCLUDE YOUR CODE HERE
+  walker[ic] = u*u;
+  walker[im] = m;
+  walker[ix] = m*m;
 }
-
 
 void Reset(int iblk) //Reset block averages
 {
@@ -230,18 +240,55 @@ void Averages(int iblk) //Print results for current block
     cout << "Block number " << iblk << endl;
     cout << "Acceptance rate " << accepted/attempted << endl << endl;
 
-    Ene.open("output.ene.0",ios::app);
-    stima_u = blk_av[iu]/blk_norm/(double)nspin; //Energy
+    Ene.open("output.ene.0",ios::app); // Energy
+    stima_u = blk_av[iu]/blk_norm/(double)nspin;
     glob_av[iu]  += stima_u;
     glob_av2[iu] += stima_u*stima_u;
     err_u=Error(glob_av[iu],glob_av2[iu],iblk);
-    Ene << setw(wd) << iblk <<  setw(wd) << stima_u << setw(wd) << glob_av[iu]/(double)iblk << setw(wd) << err_u << endl;
+    Ene << temp << setw(wd) << iblk <<  setw(wd) << stima_u << setw(wd) << glob_av[iu]/(double)iblk << setw(wd) << err_u << endl;
     Ene.close();
 
+    Heat.open("output.heat_capacity.0",ios::app); // Heat capacity
+    stima_u2 = (blk_av[ic]/blk_norm);
+    stima_c = beta*beta*(stima_u2 - (blk_av[iu]/blk_norm)*(blk_av[iu]/blk_norm))/(double)nspin;
+    glob_av[ic]  += stima_c;
+    glob_av2[ic] += stima_c*stima_c;
+    err_c=Error(glob_av[ic],glob_av2[ic],iblk);
+    Heat << temp << setw(wd) << iblk <<  setw(wd) << stima_c << setw(wd) << glob_av[ic]/(double)iblk << setw(wd) << err_c << endl;
+    Heat.close();
+
+    Mag.open("output.mag.0",ios::app); // Magnetization
+    stima_m = blk_av[im]/blk_norm/(double)nspin;
+    glob_av[im]  += stima_m;
+    glob_av2[im] += stima_m*stima_m;
+    err_m=Error(glob_av[im],glob_av2[im],iblk);
+    Mag << temp << setw(wd) << iblk <<  setw(wd) << stima_m << setw(wd) << glob_av[im]/(double)iblk << setw(wd) << err_m << endl;
+    Mag.close();
+
+    Chi.open("output.chi.0",ios::app); // Magnetic susceptibility
+    stima_x = beta*(blk_av[ix]/blk_norm)/(double)nspin;
+    glob_av[ix]  += stima_x;
+    glob_av2[ix] += stima_x*stima_x;
+    err_x=Error(glob_av[ix],glob_av2[ix],iblk);
+    Chi << temp << setw(wd) << iblk <<  setw(wd) << stima_x << setw(wd) << glob_av[ix]/(double)iblk << setw(wd) << err_x << endl;
+    Chi.close();
+
     if(iblk==nblk){
-        Ene_T.open("results/energy_vs_temperature.dat",ios::app);
+        Ene_T.open("results/temp/energy_vs_temperature.dat",ios::app);
         Ene_T << temp << " " << glob_av[iu]/(double)iblk << " " << err_u << endl;
         Ene_T.close();
+
+        Heat_T.open("results/temp/heat_capacity_vs_temperature.dat",ios::app);
+        Heat_T << temp << " " << glob_av[ic]/(double)iblk << " " << err_c << endl;
+        Heat_T.close();
+
+        Mag_T.open("results/temp/magnetization_vs_temperature.dat",ios::app);
+        Mag_T << temp << " " << glob_av[im]/(double)iblk << " " << err_m << endl;
+        Mag_T.close();
+
+        Chi_T.open("results/temp/magnetic_susceptibility_vs_temperature.dat",ios::app);
+        Chi_T << temp << " " << glob_av[ix]/(double)iblk << " " << err_x << endl;
+        Chi_T.close();
     }
 
 // INCLUDE YOUR CODE HERE

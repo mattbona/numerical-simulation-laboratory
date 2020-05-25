@@ -25,7 +25,7 @@ double walker[m_props];
 // averages
 double blk_av[m_props],blk_norm,accepted,attempted;
 double glob_av[m_props],glob_av2[m_props];
-double stima_u,stima_c,stima_m,stima_x,stima_g;
+double stima_u,stima_u2, stima_c,stima_m,stima_x,stima_g;
 double err_u,err_c,err_m,err_x,err_g;
 
 //configuration
