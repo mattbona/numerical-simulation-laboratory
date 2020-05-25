@@ -1,7 +1,7 @@
 # numerical-simulation-laboratory
 A GitHub repo complete with the exercises from the 2019-2020 Numerical Simulation Laboratory held by Davide Emilio Galli.
 
-All the jupyter notebooks relative to the exercises are found in `NSL-0*/notebook/`.
+All the jupyter notebooks relative to the exercises are found in `NSL-*/notebook/`.
 
 ### Completed exercises
 * NSL-01:
@@ -28,3 +28,5 @@ All the jupyter notebooks relative to the exercises are found in `NSL-0*/noteboo
 	- EX 04.3
 * NSL-05:
 	- EX 05.1
+* NSL-06:
+	- EX 06.1
