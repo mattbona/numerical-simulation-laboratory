@@ -264,7 +264,7 @@ void Measure(){ //Properties measurement
             //update of the histogram of g(r)
             bin = igofr + (int)(dr/bin_size);
             if(bin < igofr + nbins)
-                blk_av[bin] += 1.0;
+                blk_av[bin] += 2.0;
 
             if(dr < rcut){
                 vij = 4.0/pow(dr,12) - 4.0/pow(dr,6);
