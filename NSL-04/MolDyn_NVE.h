@@ -8,10 +8,15 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 *****************************************************************
 *****************************************************************/
 //parameters, observables
-const int m_props=4;
+const int m_props=200;
 int n_props;
-int iv,ik,it,ie;
-double stima_pot, stima_kin, stima_etot, stima_temp,stima_pres;
+int igofr;
+int iv,ik,it,ie,ip;
+double stima_pot, stima_kin, stima_etot, stima_temp, stima_pres;
+double blk_av[m_props];
+double glob_av[m_props],glob_av2[m_props];
+double blk_norm, bin_size;
+int nbins;
 
 // averages
 double acc,att;
@@ -26,35 +31,22 @@ int npart;
 double energy,temp,vol,rho,box,rcut;
 
 // simulation
-int nstep, iprint, seed;
-int nblocks = 100;
-double delta;
-
-//Prepare array for blocking method
-double *av_Epot  = new double[nblocks]();
-double *av_EKin  = new double[nblocks]();
-double *av_Etot  = new double[nblocks]();
-double *av_Temp  = new double[nblocks]();
-double *av_Pres  = new double[nblocks]();
-
-double *av2_Epot  = new double[nblocks]();
-double *av2_EKin  = new double[nblocks]();
-double *av2_Etot  = new double[nblocks]();
-double *av2_Temp  = new double[nblocks]();
-double *av2_Pres  = new double[nblocks]();
-
-//equilibration
-bool restart;
+int nstep, nblk, seed;
 int eqsteps;
+double delta;
+bool restart;
 
 //functions
 void Input(void);
 void Move(void);
 void ConfFinal(void);
 void ConfXYZ(int);
-void Measure(int);
+void Measure(void);
 double Force(int, int);
 double Pbc(double);
+void Reset(int);
+void Averages(int);
+
 /****************************************************************
 *****************************************************************
     _/    _/  _/_/_/  _/       Numerical Simulation Laboratory
