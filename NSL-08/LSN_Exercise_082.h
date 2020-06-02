@@ -16,8 +16,13 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 int seed[4];
 Random rnd;
 
+// simulated annealing
+bool simulated_annealing=0;
+double starting_temp=0, starting_mu=0, starting_sigma=0;
+
 //parameters, observables
 double mu=0.8, sigma=0.6;
+double x_pos=0;
 
 const int m_props=10;
 int n_props, ih;
@@ -34,11 +39,14 @@ double delta;
 
 //functions
 void Input(void);
+void OptimizeParameters(void);
 void Reset(int);
 void Accumulate(void);
 void Averages(int);
-void Move(void);
+void Move(double,double);
 void Measure(void);
+double VariationalPsi(double,double,double);
+double Hamiltonian(double,double,double);
 double Error(double,double,int);
 
 #endif
