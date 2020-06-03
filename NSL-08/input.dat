@@ -13,4 +13,4 @@
     ReadInput >> nblk;
     ReadInput >> nstep;
     ReadInput >> simulated_annealing;
-    ReadInput >> starting_temp; funziona: 0.001
+    ReadInput >> starting_temp; 
