@@ -19,7 +19,7 @@ See: http://root.cern.ch
 There are two other source files, too:
 constants.h: contains the declaration of every global variable that has been used.
 functions.h: contains the declaration of the function with a brief description.
-Once compiled, QMC1D is invoked with the command: "./qmc1d". It will read the settings 
+Once compiled, QMC1D is invoked with the command: "./qmc1d". It will read the settings
 in the file "input.dat".
 */
 #include <iostream>
@@ -38,25 +38,25 @@ using namespace std;
 
 int main()
 {
-        readInput();  
-	initialize();  
+        readInput();
+	initialize();
 /* at this time, every variable you see, such for instance "equilibration",
 has been either acquired from "input.dat" by the readInput() function or
 opportunely initialized by the initialize() function. */
 	for(int i=0;i<equilibration;i++)
 	{
-		if(PIGS)   // only a PIGS polymer has a start and an end. 
+		if(PIGS)   // only a PIGS polymer has a start and an end.
 		{
 			brownianMotion(LEFT);
 			brownianMotion(RIGHT);
 		}
-		
+
 		translation();
-		
-		for(int j=0;j<brownianBridgeAttempts;j++) 
+
+		for(int j=0;j<brownianBridgeAttempts;j++)
 			brownianBridge();
 	}
-	
+
 	for(int b=0;b<blocks;b++)
 	{
 		for(int i=0;i<MCSTEPS;i++)
@@ -67,16 +67,16 @@ opportunely initialized by the initialize() function. */
 				brownianMotion(RIGHT);
 			}
 			translation();
-		
+
 			for(int j=0;j<brownianBridgeAttempts;j++)
 				brownianBridge();
-			
+
 			upgradeAverages();
 		}
 		cout<<"Completed block: "<<b+1<<"/"<<blocks<<endl;
 		endBlock();
 	}
-	
+
 	consoleOutput();
 	finalizePotentialEstimator();
 	finalizeKineticEstimator();
@@ -91,7 +91,7 @@ double potential_density_matrix(double val, double val_next)
 {
 	double dens_left = -dtau*external_potential(val)/2;
 	double dens_right = -dtau*external_potential(val_next)/2;
-	
+
 	return dens_left+dens_right;
 }
 
@@ -103,12 +103,12 @@ void initialize()
 		PIGS=1;
 	else
 		PIGS=0;
-	
+
 	if(PIGS)
 		dtau = imaginaryTimePropagation/(timeslices-1);
 	else
 		dtau = hbar/(boltzmann*temperature*timeslices);
-	
+
 	acceptedTranslations=0;
 	acceptedVariational=0;
 	acceptedBB=0;
@@ -117,25 +117,25 @@ void initialize()
 	totalVariational=0;
 	totalBB=0;
         totalBM=0;
-	
+
 	generator = new TRandom3();
-	
+
 	positions=new double[timeslices];
 	potential_energy=new double[timeslices];
 	potential_energy_accumulator=new double[timeslices];
 	potential_energy_square_accumulator=new double[timeslices];
-                                                                                                                 
+
 	kinetic_energy=new double[timeslices];
 	kinetic_energy_accumulator=new double[timeslices];
 	kinetic_energy_square_accumulator=new double[timeslices];
-                                                                                                                
+
 	positions_histogram=new double[histogram_bins];
 	positions_histogram_accumulator=new double[histogram_bins];
 	positions_histogram_square_accumulator=new double[histogram_bins];
-	
+
 	for(int i=0;i<timeslices;i++)
 		positions[i]=0.0;
-	
+
 	for(int i=0;i<timeslices;i++)
 	{
 		potential_energy[i]=0;
@@ -146,7 +146,7 @@ void initialize()
 		kinetic_energy_accumulator[i]=0;
 		kinetic_energy_square_accumulator[i]=0;
 	}
-	
+
 	for(int i=0;i<histogram_bins;i++)
 	{
 		positions_histogram[i]=0;
@@ -160,20 +160,17 @@ void initialize()
 // to modify its first and second derivatives too !
 double external_potential(double val)
 {
-	double k_elastic = 1;
-	return k_elastic*val*val/2.0;
+	return val*val*val*val - 2.5*val*val;
 }
 
 double external_potential_prime(double val)
 {
-	double k_elastic =1;
-	return k_elastic*val;
+	return 4.*val*val*val - 5.*val;
 }
 
 double external_potential_second(double val)
 {
-	double k_elastic=1;
-	return k_elastic;
+	return 12.*val*val - 5.;
 }
 
 // The same applies to the variational Wave Function...
@@ -181,14 +178,20 @@ double external_potential_second(double val)
 // to modify its second derivative below!
 double variationalWaveFunction(double v)
 {
-	return 1.0;
-	//return exp(-0.5*v*v);
+	//return 1.0;
+
+    double mu=0.791754, sigma=0.637379;
+    return exp(-1*(v-mu)*(v-mu)/ (2*sigma*sigma)) + exp(-1*(v+mu)*(v+mu) / (2*sigma*sigma));
 }
 
 double variationalWaveFunction_second(double v)
 {
-	return 0;
-	//return v*v*exp(-0.5*v*v) - exp(-0.5*v*v);
+	//return 0;
+
+    double mu=0.791754, sigma=0.637379;
+    return  exp(-(v-mu)*(v-mu)/(2.*sigma*sigma)) * (mu*mu-sigma*sigma+v*v-2.*mu*v)/(sigma*sigma*sigma*sigma) +
+            exp(-(v+mu)*(v+mu)/(2.*sigma*sigma)) * (mu*mu-sigma*sigma+v*v+2.*mu*v)/(sigma*sigma*sigma*sigma);
+
 }
 
 void translation()
@@ -199,7 +202,7 @@ void translation()
 	int last = timeslices;
 	if(PIGS)
 		last=timeslices-1;
-		
+
 	for(int i=0;i<last;i++)
 	{
 		int inext = index_mask(i+1);
@@ -210,10 +213,10 @@ void translation()
 	}
 	// metropolis: PIGS contains also the statistical weight of the variational Wave Function.
 	double acceptance_probability = exp(-acc_density_matrix_difference);
-	
+
 	if(PIGS)
 		acceptance_probability *=variationalWaveFunction(positions[0]+delta)*variationalWaveFunction(positions[timeslices-1]+delta)/(variationalWaveFunction(positions[0])*variationalWaveFunction(positions[timeslices-1]));
-	
+
 	if(generator->Rndm()<acceptance_probability)
 	{
 		for(int i=0;i<timeslices;i++)
@@ -225,9 +228,9 @@ void translation()
 /* BB removes a segment of the polymer, in this case from "starting_point+1" to "endpoint-1"
 and replaces it with a free particle propagation. The free particle propagation is achieved
 with the gaussian sampling of the kinetic part of the density matrix.
-The function index_mask handles the compatibility between PIGS and PIMC: in PIGS the polymer is 
+The function index_mask handles the compatibility between PIGS and PIMC: in PIGS the polymer is
 open, so you can't have a starting index greater than an ending index. In PIMC, instead, you
-have a ring polymer so when you reach the end you can continue from the beginning. 
+have a ring polymer so when you reach the end you can continue from the beginning.
 The compatibility solution that has been chosen consists in viewing the ring polymer as an open
 polymer that has been closed on periodic boundary contitions. index_mask takes this into account. */
 void brownianBridge()
@@ -237,9 +240,9 @@ void brownianBridge()
 	if(!PIGS)
 		available_starting_points = timeslices-1;
 	int starting_point = (int)(generator->Rndm()*available_starting_points);
-	
+
 	int endpoint = index_mask(starting_point + brownianBridgeReconstructions + 1);
-	
+
 	double starting_coord = positions[starting_point];
 	double ending_coord = positions[endpoint];
 	double new_segment[brownianBridgeReconstructions+2];
@@ -256,7 +259,7 @@ void brownianBridge()
 		new_segment[i+1] = newcoordinate;
 		previous_position=newcoordinate;
 	}
-	
+
 	// metropolis. Note that the kinetic part has been sampled exactely, thus only the
 	// potential part of the density matrix determines the acceptance probability of the move.
 	double acc_density_matrix_difference=0;
@@ -269,7 +272,7 @@ void brownianBridge()
 		oldcorr = potential_density_matrix(positions[i_old],positions[i_next_old]);
 		acc_density_matrix_difference += oldcorr-newcorr;
 	}
-	
+
 	double acceptance_probability = exp(-acc_density_matrix_difference);
 	if(generator->Rndm()<acceptance_probability)
 	{
@@ -376,19 +379,19 @@ void consoleOutput()
 }
 
 
-/* This function accumulates the expectation values in their respective variables. 
+/* This function accumulates the expectation values in their respective variables.
    At the end of the block, these variables are divided by the MCSTEPS value and the block average
-   and its squared value are accumulated in apposite variables.  
+   and its squared value are accumulated in apposite variables.
  */
 void upgradeAverages()
 {
 	for(int i=0;i<timeslices;i++)
 		potential_energy[i]+=external_potential(positions[i]);
-	
+
 	int flag=0;
 	if(PIGS)
 		flag=1;
-		
+
 	for(int i=flag;i<timeslices-flag;i++)
 	{
 		int i_mod = index_mask(i);
@@ -400,12 +403,12 @@ void upgradeAverages()
 		kinetic_energy[0]+=variationalLocalEnergy(positions[0]);
 		kinetic_energy[timeslices-1]+=variationalLocalEnergy(positions[timeslices-1]);
 	}
-	
+
 	upgradeHistogram();
 }
 
 /*
-This functions performs a common way to fill in the values of an histogram. 
+This functions performs a common way to fill in the values of an histogram.
 It's quite straightforward.
 */
 void upgradeHistogram()
@@ -432,9 +435,9 @@ void endBlock()  // calculating and accumulating block averages
 		kinetic_energy_accumulator[i]+=kinetic_energy[i];
 		kinetic_energy_square_accumulator[i]+=kinetic_energy[i]*kinetic_energy[i];
 		kinetic_energy[i]=0;
-		
+
 	}
-	
+
 	for(int i=0;i<histogram_bins;i++)
 	{
 		positions_histogram[i]/=MCSTEPS;
@@ -493,7 +496,7 @@ void finalizeHistogram()
 		hist_square_avg = positions_histogram_square_accumulator[i]/blocks;
 		error =sqrt(abs(hist_average*hist_average-hist_square_avg)/blocks);
                 out << current_position << " " << hist_average/norma << " " << error/norma << endl;
-                
+
         }
 	out.close();
 }
@@ -546,11 +549,11 @@ void deleteMemory()
 	delete potential_energy;
 	delete potential_energy_accumulator;
 	delete potential_energy_square_accumulator;
-                                                                                                                 
+
 	delete kinetic_energy;
 	delete kinetic_energy_accumulator;
 	delete kinetic_energy_square_accumulator;
-                                                                                                                 
+
 	delete positions_histogram;
 	delete positions_histogram_accumulator;
 	delete positions_histogram_square_accumulator;
