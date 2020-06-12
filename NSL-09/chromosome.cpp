@@ -79,13 +79,13 @@ double Chromosome :: GetPathL1Distance(){
                 l1_distance += sqrt(
                         ((*p_world)[j].x - (*p_world)[k].x)*((*p_world)[j].x - (*p_world)[k].x) +
                         ((*p_world)[j].y - (*p_world)[k].y)*((*p_world)[j].y - (*p_world)[k].y) );
-                // Add last trip
-                j=path[number_of_cities-1];
-                k=path[0];
-                l1_distance += sqrt(
-                        ((*p_world)[j].x - (*p_world)[k].x)*((*p_world)[j].x - (*p_world)[k].x) +
-                        ((*p_world)[j].y - (*p_world)[k].y)*((*p_world)[j].y - (*p_world)[k].y) );
         }
+        // Add last trip
+        j=path[number_of_cities-1];
+        k=path[0];
+        l1_distance += sqrt(
+                ((*p_world)[j].x - (*p_world)[k].x)*((*p_world)[j].x - (*p_world)[k].x) +
+                ((*p_world)[j].y - (*p_world)[k].y)*((*p_world)[j].y - (*p_world)[k].y) );
         return l1_distance;
 };
 
@@ -98,13 +98,13 @@ double Chromosome :: GetPathL2Distance(){
                 l2_distance +=
                         ((*p_world)[j].x - (*p_world)[k].x)*((*p_world)[j].x - (*p_world)[k].x) +
                         ((*p_world)[j].y - (*p_world)[k].y)*((*p_world)[j].y - (*p_world)[k].y);
-                // Add last trip
-                j=path[number_of_cities-1];
-                k=path[0];
-                l2_distance +=
-                        ((*p_world)[j].x - (*p_world)[k].x)*((*p_world)[j].x - (*p_world)[k].x) +
-                        ((*p_world)[j].y - (*p_world)[k].y)*((*p_world)[j].y - (*p_world)[k].y);
         }
+        // Add last trip
+        j=path[number_of_cities-1];
+        k=path[0];
+        l2_distance +=
+                ((*p_world)[j].x - (*p_world)[k].x)*((*p_world)[j].x - (*p_world)[k].x) +
+                ((*p_world)[j].y - (*p_world)[k].y)*((*p_world)[j].y - (*p_world)[k].y);
         return l2_distance;
 };
 
