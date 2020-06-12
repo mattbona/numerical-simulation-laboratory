@@ -7,29 +7,35 @@
 _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 *****************************************************************
 *****************************************************************/
-#ifndef __LSN_EXERCISE_091__
-#define __LSN_EXERCISE_091__
+#ifndef __POPULATION__
+#define __POPULATION__
 
 #include <vector>
+#include <iostream>
+#include <fstream>
+#include <cmath>
+#include <cstdlib>
 #include "random.h"
 #include "city.h"
+#include "chromosome.h"
 
-//### Variables
-// Random numbers
-Random rnd;
+class Population{
 
-// World variables
-int number_of_cities;
-std::vector<city> world;
-// Genetic Algorithm
-int number_of_generations;
-int population_size;
+private:
+        int population_size;
+        std::vector<Chromosome> population;
+public:
+        // Constructor
+        Population();
+        // Destructor
+        ~Population();
+        // Methods
+        void InitializePopulation(int, int, std::vector<city>*, Random*);
+        std::vector<Chromosome> GetPopulation();
 
-//### Functions
-void Input(void);
+};
 
 #endif
-
 /****************************************************************
 *****************************************************************
     _/    _/  _/_/_/  _/       Numerical Simulation Laboratory

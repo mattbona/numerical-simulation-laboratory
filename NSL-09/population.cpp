@@ -7,28 +7,29 @@
 _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 *****************************************************************
 *****************************************************************/
-#ifndef __LSN_EXERCISE_091__
-#define __LSN_EXERCISE_091__
+#include "population.h"
 
-#include <vector>
-#include "random.h"
-#include "city.h"
+using namespace std;
 
-//### Variables
-// Random numbers
-Random rnd;
+// Constructor
+Population :: Population(){};
+// Destructor
+Population :: ~Population(){};
+// Methods
+void Population :: InitializePopulation(int my_population_size, int my_number_of_cities,
+                                        std::vector<city> *my_p_world, Random *my_p_rnd){
+        population_size = my_population_size;
+        // Initialize population with chromosomes that have
+        // uniform distributed path permutation
+        population.resize(population_size);
+        for(int i=0; i< population_size; i++)
+                population[i].InitializeChromosome(my_number_of_cities,
+                                                   my_p_world,my_p_rnd);
+};
 
-// World variables
-int number_of_cities;
-std::vector<city> world;
-// Genetic Algorithm
-int number_of_generations;
-int population_size;
-
-//### Functions
-void Input(void);
-
-#endif
+std::vector<Chromosome> Population :: GetPopulation(){
+        return population;
+};
 
 /****************************************************************
 *****************************************************************

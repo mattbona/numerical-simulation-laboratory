@@ -7,26 +7,13 @@
 _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 *****************************************************************
 *****************************************************************/
-#ifndef __LSN_EXERCISE_091__
-#define __LSN_EXERCISE_091__
 
-#include <vector>
-#include "random.h"
-#include "city.h"
+#ifndef __CITY__
+#define __CITY__
 
-//### Variables
-// Random numbers
-Random rnd;
-
-// World variables
-int number_of_cities;
-std::vector<city> world;
-// Genetic Algorithm
-int number_of_generations;
-int population_size;
-
-//### Functions
-void Input(void);
+struct city{
+        double x, y;
+};
 
 #endif
 
