@@ -15,6 +15,8 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 #include <fstream>
 #include <cmath>
 #include <cstdlib>
+#include <numeric>      // std::iota
+#include <algorithm>    // std::sort
 #include "random.h"
 #include "city.h"
 #include "chromosome.h"
@@ -31,9 +33,13 @@ public:
         ~Population();
         // Methods
         void InitializePopulation(int, int, std::vector<city>*, Random*);
+        void SortPopulation();
         std::vector<Chromosome> GetPopulation();
 
 };
+
+//Functions
+std::vector<int> get_sorted_indexes_vector(const std::vector<double> &);
 
 #endif
 /****************************************************************

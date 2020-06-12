@@ -40,9 +40,10 @@ public:
 
 };
 
+// Functions
+double get_R2_square_norm(double, double, double, double);
 
 #endif
-
 /****************************************************************
 *****************************************************************
     _/    _/  _/_/_/  _/       Numerical Simulation Laboratory

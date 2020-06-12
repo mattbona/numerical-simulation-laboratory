@@ -76,16 +76,14 @@ double Chromosome :: GetPathL1Distance(){
         for(int i=0; i<(number_of_cities-1); i++){
                 j = path[i];
                 k = path[i+1];
-                l1_distance += sqrt(
-                        ((*p_world)[j].x - (*p_world)[k].x)*((*p_world)[j].x - (*p_world)[k].x) +
-                        ((*p_world)[j].y - (*p_world)[k].y)*((*p_world)[j].y - (*p_world)[k].y) );
+                l1_distance += sqrt(get_R2_square_norm((*p_world)[j].x,(*p_world)[k].x,
+                                                 (*p_world)[j].y, (*p_world)[k].y));
         }
         // Add last trip
         j=path[number_of_cities-1];
         k=path[0];
-        l1_distance += sqrt(
-                ((*p_world)[j].x - (*p_world)[k].x)*((*p_world)[j].x - (*p_world)[k].x) +
-                ((*p_world)[j].y - (*p_world)[k].y)*((*p_world)[j].y - (*p_world)[k].y) );
+        l1_distance += sqrt(get_R2_square_norm((*p_world)[j].x,(*p_world)[k].x,
+                                         (*p_world)[j].y, (*p_world)[k].y));
         return l1_distance;
 };
 
@@ -95,19 +93,21 @@ double Chromosome :: GetPathL2Distance(){
         for(int i=0; i<(number_of_cities-1); i++){
                 j = path[i];
                 k = path[i+1];
-                l2_distance +=
-                        ((*p_world)[j].x - (*p_world)[k].x)*((*p_world)[j].x - (*p_world)[k].x) +
-                        ((*p_world)[j].y - (*p_world)[k].y)*((*p_world)[j].y - (*p_world)[k].y);
+                l2_distance += get_R2_square_norm((*p_world)[j].x,(*p_world)[k].x,
+                                            (*p_world)[j].y, (*p_world)[k].y);
         }
         // Add last trip
         j=path[number_of_cities-1];
         k=path[0];
-        l2_distance +=
-                ((*p_world)[j].x - (*p_world)[k].x)*((*p_world)[j].x - (*p_world)[k].x) +
-                ((*p_world)[j].y - (*p_world)[k].y)*((*p_world)[j].y - (*p_world)[k].y);
+        l2_distance += get_R2_square_norm((*p_world)[j].x,(*p_world)[k].x,
+                                    (*p_world)[j].y, (*p_world)[k].y);
         return l2_distance;
 };
 
+// Functions
+double get_R2_square_norm(double x1, double x2, double y1, double y2){
+        return (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2);
+};
 
 /****************************************************************
 *****************************************************************

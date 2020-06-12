@@ -7,14 +7,7 @@
 _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 *****************************************************************
 *****************************************************************/
-#include <iostream>
-#include <fstream>
-#include <ostream>
-#include <cmath>
-#include <iomanip>
 #include "LSN_Exercise_091.h"
-#include "chromosome.h"
-#include "population.h"
 
 using namespace std;
 
@@ -23,22 +16,20 @@ int main()
         // Inizialization
         Input();
 
-
-        Population path_population;
-        path_population.InitializePopulation(population_size, number_of_cities,
-                                             &world, &rnd);
-
+        cout << "not sorted:\n";
         for(int j=0; j<population_size; j++){
-                for(int i=0; i<number_of_cities; i++)
-                        cout << path_population.GetPopulation()[j].GetPath()[i] << endl;
-                cout << path_population.GetPopulation()[j].GetPathL2Distance() << endl;
-                cout << endl;
+                cout << path_population.GetPopulation()[j].GetPathL1Distance() << endl;
+        }
+        path_population.SortPopulation();
+        cout << "sorted:\n";
+        for(int j=0; j<population_size; j++){
+                cout << path_population.GetPopulation()[j].GetPathL1Distance() << endl;
         }
 
         return 0;
 }
 
-//##############################################################################
+//### Functions
 void Input(void){
         int seed[4];
         int p1, p2;
@@ -80,6 +71,11 @@ void Input(void){
 
         ReadInput.close();
         ReadConfig.close();
+
+        // Create an initial population
+        path_population.InitializePopulation(population_size, number_of_cities,
+                                             &world, &rnd);
+
 }
 
 /****************************************************************
