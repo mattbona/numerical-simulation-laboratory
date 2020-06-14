@@ -41,12 +41,13 @@ public:
         Population(const Population&);
         // Methods
         std::vector<Chromosome> GetPopulation();
+        void SetPopulation(std::vector<Chromosome>);
         void InitializePopulation(int, int, std::vector<city>*, Random*);
         void SortPopulation();
         void SetMutationProbabilities(double, double, double, double, double);
-        void MutateChromosomes(int, int);
+        std::vector<Chromosome> GetMutatedChromosomes(Chromosome,Chromosome);
         void SetCrossoverProbability(double);
-        void CrossoverChromosomes(int, int);
+        std::vector<Chromosome> GetCrossoveredChromosomes(int, int);
 };
 //Functions
 std::vector<int> get_sorted_indexes_vector(const std::vector<double> &);

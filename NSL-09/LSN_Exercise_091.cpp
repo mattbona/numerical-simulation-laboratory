@@ -20,22 +20,15 @@ int main()
                 if(igeneration%nprint==0)
                         cout<<"Generation number: "<<igeneration<<endl;
                 path_population.SortPopulation();
-                /*
-                // Verify sorting
-                for(int i=0; i<1;i++){
-                        cout << "[";
-                        for(int icity=0; icity < number_of_cities; icity++){
-                                cout<<path_population.GetPopulation()[i].GetPath()[icity]<<",";
-                        }
-                        cout <<"]\nL1 distance = " <<path_population.GetPopulation()[i].GetPathL1Distance()<<endl;
-                }
-                */
                 for(int j=0; j<population_size; j=j+2){
                         int k=RiggedRoulette(r, population_size);
                         int l=RiggedRoulette(r, population_size);
-                        path_population.CrossoverChromosomes(k, l);
-                        path_population.MutateChromosomes(k, l);
+                        offspring = path_population.GetCrossoveredChromosomes(k, l);
+                        offspring = path_population.GetMutatedChromosomes(offspring[0],offspring[1]);
+                        new_path_population[j] = offspring[0];
+                        new_path_population[j+1] = offspring[1];
                 };
+                path_population.SetPopulation(new_path_population);
                 PrintPathL1Distances(path_population,igeneration);
         };
         PrintBestPath(path_population);
@@ -94,6 +87,8 @@ void Input(void){
 
         nprint = number_of_generations/10;
 
+        // Initialize empty population vector
+        new_path_population.resize(population_size);
         // Initialize population class
         path_population.InitializePopulation(population_size, number_of_cities,
                                              &world, &rnd);
@@ -146,7 +141,6 @@ void PrintBestPath(Population my_path_population){
 
         best_path.close();
 };
-
 /****************************************************************
 *****************************************************************
     _/    _/  _/_/_/  _/       Numerical Simulation Laboratory

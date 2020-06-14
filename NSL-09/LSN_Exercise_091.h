@@ -34,6 +34,7 @@ std::vector<city> world;
 int number_of_generations=0;
 int population_size=0;
 Population path_population;
+std::vector<Chromosome> new_path_population, offspring(2);
 double r=0;
 double permutation_probability=0;
 double block_permutation_probability=0;

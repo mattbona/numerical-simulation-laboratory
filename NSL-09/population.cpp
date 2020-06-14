@@ -22,11 +22,13 @@ Population :: Population(const Population& my_population){
         this->population = my_population.population;
         this->permutation_probability = my_population.permutation_probability;
         this->shift_probability = my_population.shift_probability;
-
 };
 // Methods
 std::vector<Chromosome> Population :: GetPopulation(){
         return population;
+};
+void Population :: SetPopulation(std::vector<Chromosome> my_population){
+        this->population = my_population;
 };
 void Population :: InitializePopulation(int my_population_size, int my_number_of_cities,
                                         std::vector<city> *my_p_world, Random *my_p_rnd){
@@ -55,56 +57,10 @@ void Population :: SortPopulation(){
         }
         this->population = new_population;
 };
-void Population :: SetMutationProbabilities(double my_permutation_probability,
-                                            double my_block_permutation_probability,
-                                            double my_shift_probability,
-                                            double my_partial_shift_probability,
-                                            double my_inversion_probability){
-        this->permutation_probability = my_permutation_probability;
-        this->block_permutation_probability = my_block_permutation_probability;
-        this->shift_probability = my_shift_probability;
-        this->partial_shift_probability = my_partial_shift_probability;
-        this->inversion_probability = my_inversion_probability;
-};
-void Population :: MutateChromosomes(int k, int l){
-        vector<Chromosome> mutated_chromosome(2);
-        mutated_chromosome[0] = this->population[k];
-        mutated_chromosome[1] = this->population[l];
-
-        // Chromosome 1
-        if(p_rnd->Rannyu() < permutation_probability)
-                mutated_chromosome[0].PermutePath();
-        if(p_rnd->Rannyu() < block_permutation_probability)
-                mutated_chromosome[0].BlockPermutePath();
-        if(p_rnd->Rannyu() < shift_probability)
-                mutated_chromosome[0].ShiftPath();
-        if(p_rnd->Rannyu() < partial_shift_probability)
-                mutated_chromosome[0].PartialShiftPath();
-        if(p_rnd->Rannyu() < inversion_probability)
-                mutated_chromosome[0].InvertPath();
-        // Chromosome 2
-        if(p_rnd->Rannyu() < permutation_probability)
-                mutated_chromosome[1].PermutePath();
-        if(p_rnd->Rannyu() < block_permutation_probability)
-                mutated_chromosome[1].BlockPermutePath();
-        if(p_rnd->Rannyu() < shift_probability)
-                mutated_chromosome[1].ShiftPath();
-        if(p_rnd->Rannyu() < partial_shift_probability)
-                mutated_chromosome[1].PartialShiftPath();
-        if(p_rnd->Rannyu() < inversion_probability)
-                mutated_chromosome[1].InvertPath();
-
-        // Check if mutated paths fullfil the bonds
-        mutated_chromosome[0].CheckPath();
-        mutated_chromosome[1].CheckPath();
-
-        this->population[k] = mutated_chromosome[0];
-        this->population[l] = mutated_chromosome[1];
-};
 void Population :: SetCrossoverProbability(double my_crossover_probability){
         this-> crossover_probability = my_crossover_probability;
 };
-void Population :: CrossoverChromosomes(int k, int l){
+std::vector<Chromosome> Population :: GetCrossoveredChromosomes(int k, int l){
         vector<Chromosome> offspring(2);
         vector<vector<int>> offspring_path(2);
         offspring[0] = this->population[k];
@@ -142,9 +98,56 @@ void Population :: CrossoverChromosomes(int k, int l){
                 offspring[0].CheckPath();
                 offspring[1].CheckPath();
 
-                this->population[k] = offspring[0];
-                this->population[l] = offspring[1];
-        }
+               return offspring;
+       }else{
+               return offspring;
+       };
+
+};
+void Population :: SetMutationProbabilities(double my_permutation_probability,
+                                            double my_block_permutation_probability,
+                                            double my_shift_probability,
+                                            double my_partial_shift_probability,
+                                            double my_inversion_probability){
+        this->permutation_probability = my_permutation_probability;
+        this->block_permutation_probability = my_block_permutation_probability;
+        this->shift_probability = my_shift_probability;
+        this->partial_shift_probability = my_partial_shift_probability;
+        this->inversion_probability = my_inversion_probability;
+};
+std::vector<Chromosome> Population :: GetMutatedChromosomes(Chromosome my_chromosome1, Chromosome my_chromosome2){
+        vector<Chromosome> mutated_chromosome(2);
+        mutated_chromosome[0] = my_chromosome1;
+        mutated_chromosome[1] = my_chromosome2;
+
+        // Chromosome 1
+        if(p_rnd->Rannyu() < permutation_probability)
+                mutated_chromosome[0].PermutePath();
+        if(p_rnd->Rannyu() < block_permutation_probability)
+                mutated_chromosome[0].BlockPermutePath();
+        if(p_rnd->Rannyu() < shift_probability)
+                mutated_chromosome[0].ShiftPath();
+        if(p_rnd->Rannyu() < partial_shift_probability)
+                mutated_chromosome[0].PartialShiftPath();
+        if(p_rnd->Rannyu() < inversion_probability)
+                mutated_chromosome[0].InvertPath();
+        // Chromosome 2
+        if(p_rnd->Rannyu() < permutation_probability)
+                mutated_chromosome[1].PermutePath();
+        if(p_rnd->Rannyu() < block_permutation_probability)
+                mutated_chromosome[1].BlockPermutePath();
+        if(p_rnd->Rannyu() < shift_probability)
+                mutated_chromosome[1].ShiftPath();
+        if(p_rnd->Rannyu() < partial_shift_probability)
+                mutated_chromosome[1].PartialShiftPath();
+        if(p_rnd->Rannyu() < inversion_probability)
+                mutated_chromosome[1].InvertPath();
+
+        // Check if mutated paths fullfil the bonds
+        mutated_chromosome[0].CheckPath();
+        mutated_chromosome[1].CheckPath();
+
+        return mutated_chromosome;
 };
 // Functions
 vector<int> get_sorted_indexes_vector(const vector<double> &v){
