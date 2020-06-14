@@ -20,10 +20,20 @@ int main()
                 if(igeneration%nprint==0)
                         cout<<"Generation number: "<<igeneration<<endl;
                 path_population.SortPopulation();
+                /*
+                // Verify sorting
+                for(int i=0; i<1;i++){
+                        cout << "[";
+                        for(int icity=0; icity < number_of_cities; icity++){
+                                cout<<path_population.GetPopulation()[i].GetPath()[icity]<<",";
+                        }
+                        cout <<"]\nL1 distance = " <<path_population.GetPopulation()[i].GetPathL1Distance()<<endl;
+                }
+                */
                 for(int j=0; j<population_size; j=j+2){
                         int k=RiggedRoulette(r, population_size);
                         int l=RiggedRoulette(r, population_size);
-                        //path_population.CrossoverChromosomes(k, l);
+                        path_population.CrossoverChromosomes(k, l);
                         path_population.MutateChromosomes(k, l);
                 };
                 PrintPathL1Distances(path_population,igeneration);
@@ -60,8 +70,11 @@ void Input(void){
         ReadInput >> population_size;
         ReadInput >> r;
         ReadInput >> permutation_probability;
+        ReadInput >> block_permutation_probability;
         ReadInput >> shift_probability;
-
+        ReadInput >> partial_shift_probability;
+        ReadInput >> inversion_probability;
+        ReadInput >> crossover_probability;
         // Read city positions from world_config.dat
         ReadConfig.open("world_config.dat");
         ReadConfig >> number_of_cities;
@@ -85,8 +98,11 @@ void Input(void){
         path_population.InitializePopulation(population_size, number_of_cities,
                                              &world, &rnd);
         path_population.SetMutationProbabilities(permutation_probability,
-                                                 shift_probability);
-
+                                                 block_permutation_probability,
+                                                 shift_probability,
+                                                 partial_shift_probability,
+                                                 inversion_probability);
+        path_population.SetCrossoverProbability(crossover_probability);
 };
 // Selection
 int RiggedRoulette(double r, int population_size){

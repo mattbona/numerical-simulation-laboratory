@@ -20,7 +20,6 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 #include "city.h"
 
 class Chromosome{
-
 private:
         int number_of_cities;
         std::vector<city> *p_world;
@@ -37,14 +36,16 @@ public:
         void InitializeChromosome(int, std::vector<city> *, Random *);
         void CheckPath();
         std::vector<int> GetPath();
+        void SetPath(std::vector<int>);
         double GetPathL1Distance();
         double GetPathL2Distance();
         // Mutations
         void PermutePath();
+        void BlockPermutePath();
         void ShiftPath();
-
+        void PartialShiftPath();
+        void InvertPath();
 };
-
 // Functions
 double get_R2_square_norm(double, double, double, double);
 

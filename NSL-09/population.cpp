@@ -30,13 +30,13 @@ std::vector<Chromosome> Population :: GetPopulation(){
 };
 void Population :: InitializePopulation(int my_population_size, int my_number_of_cities,
                                         std::vector<city> *my_p_world, Random *my_p_rnd){
-        population_size = my_population_size;
-        p_rnd = my_p_rnd;
+        this->population_size = my_population_size;
+        this->p_rnd = my_p_rnd;
         // Initialize population with chromosomes that have
         // uniform distributed path permutation
-        population.resize(population_size);
-        for(int i=0; i< population_size; i++)
-                population[i].InitializeChromosome(my_number_of_cities,
+        this->population.resize(this->population_size);
+        for(int i=0; i< this->population_size; i++)
+                this->population[i].InitializeChromosome(my_number_of_cities,
                                                    my_p_world,p_rnd);
 };
 void Population :: SortPopulation(){
@@ -44,46 +44,107 @@ void Population :: SortPopulation(){
         vector<int> sorted_indexes(population_size);
         vector<Chromosome> new_population(population_size);
         // Compute L1 distances
-        for(int i=0; i<population_size; i++){
-                distances[i]= population[i].GetPathL1Distance();
+        for(int i=0; i<this->population_size; i++){
+                distances[i]= this->population[i].GetPathL1Distance();
         }
         // Sort indexes according to the L1 distance of the single path
         sorted_indexes = get_sorted_indexes_vector(distances);
         // Order the population
-        for(int i=0; i<population_size; i++){
-                new_population[i] = population[sorted_indexes[i]];
+        for(int i=0; i<this->population_size; i++){
+                new_population[i] = this->population[sorted_indexes[i]];
         }
-        population = new_population;
+        this->population = new_population;
 };
 void Population :: SetMutationProbabilities(double my_permutation_probability,
-                                            double my_shift_probability){
-        permutation_probability = my_permutation_probability;
-        shift_probability = my_shift_probability;
-
+                                            double my_block_permutation_probability,
+                                            double my_shift_probability,
+                                            double my_partial_shift_probability,
+                                            double my_inversion_probability){
+        this->permutation_probability = my_permutation_probability;
+        this->block_permutation_probability = my_block_permutation_probability;
+        this->shift_probability = my_shift_probability;
+        this->partial_shift_probability = my_partial_shift_probability;
+        this->inversion_probability = my_inversion_probability;
 };
 void Population :: MutateChromosomes(int k, int l){
         vector<Chromosome> mutated_chromosome(2);
-        mutated_chromosome[0] = population[k];
-        mutated_chromosome[1] = population[l];
+        mutated_chromosome[0] = this->population[k];
+        mutated_chromosome[1] = this->population[l];
 
         // Chromosome 1
         if(p_rnd->Rannyu() < permutation_probability)
                 mutated_chromosome[0].PermutePath();
+        if(p_rnd->Rannyu() < block_permutation_probability)
+                mutated_chromosome[0].BlockPermutePath();
         if(p_rnd->Rannyu() < shift_probability)
                 mutated_chromosome[0].ShiftPath();
-
+        if(p_rnd->Rannyu() < partial_shift_probability)
+                mutated_chromosome[0].PartialShiftPath();
+        if(p_rnd->Rannyu() < inversion_probability)
+                mutated_chromosome[0].InvertPath();
         // Chromosome 2
         if(p_rnd->Rannyu() < permutation_probability)
                 mutated_chromosome[1].PermutePath();
+        if(p_rnd->Rannyu() < block_permutation_probability)
+                mutated_chromosome[1].BlockPermutePath();
         if(p_rnd->Rannyu() < shift_probability)
                 mutated_chromosome[1].ShiftPath();
+        if(p_rnd->Rannyu() < partial_shift_probability)
+                mutated_chromosome[1].PartialShiftPath();
+        if(p_rnd->Rannyu() < inversion_probability)
+                mutated_chromosome[1].InvertPath();
 
         // Check if mutated paths fullfil the bonds
         mutated_chromosome[0].CheckPath();
         mutated_chromosome[1].CheckPath();
 
-        population[k] = mutated_chromosome[0];
-        population[l] = mutated_chromosome[1];
+        this->population[k] = mutated_chromosome[0];
+        this->population[l] = mutated_chromosome[1];
+};
+void Population :: SetCrossoverProbability(double my_crossover_probability){
+        this-> crossover_probability = my_crossover_probability;
+};
+void Population :: CrossoverChromosomes(int k, int l){
+        vector<Chromosome> offspring(2);
+        vector<vector<int>> offspring_path(2);
+        offspring[0] = this->population[k];
+        offspring[1] = this->population[l];
+        offspring_path[0]=offspring[0].GetPath();
+        offspring_path[1]=offspring[1].GetPath();
+
+        if(this->p_rnd->Rannyu()<crossover_probability){
+                int index=this->p_rnd->Rannyu(1, offspring_path[0].size());
+
+                vector<int> sequence1=offspring_path[1];
+                vector<int> sequence2=offspring_path[0];
+                for(unsigned int i=0; i<sequence1.size(); i++){
+                        if( find(offspring_path[0].begin()+index, offspring_path[0].end(), sequence1[i])
+                                 == offspring_path[0].end() ){
+                        sequence1.erase(sequence1.begin()+i);
+                        i--;
+                        }
+                }
+                for(unsigned int i=0; i<sequence2.size(); i++){
+                        if( find(offspring_path[1].begin()+index, offspring_path[1].end(), sequence2[i])
+                                 == offspring_path[1].end() ){
+                        sequence2.erase(sequence2.begin()+i);
+                        i--;
+                        }
+                }
+                for(unsigned int i=0; i<sequence1.size(); i++){
+                        offspring_path[0][i+index]=sequence1[i];
+                        offspring_path[1][i+index]=sequence2[i];
+                }
+
+                offspring[0].SetPath(offspring_path[0]);
+                offspring[1].SetPath(offspring_path[1]);
+                // Check if offsprings fullfil the bonds
+                offspring[0].CheckPath();
+                offspring[1].CheckPath();
+
+                this->population[k] = offspring[0];
+                this->population[l] = offspring[1];
+        }
 };
 // Functions
 vector<int> get_sorted_indexes_vector(const vector<double> &v){

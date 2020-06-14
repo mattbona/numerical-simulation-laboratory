@@ -36,7 +36,11 @@ int population_size=0;
 Population path_population;
 double r=0;
 double permutation_probability=0;
+double block_permutation_probability=0;
 double shift_probability=0;
+double partial_shift_probability=0;
+double inversion_probability=0;
+double crossover_probability=0;
 
 //### Functions
 void Input(void);
