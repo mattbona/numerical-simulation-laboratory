@@ -3,11 +3,11 @@
 import random
 import math
 
-number_of_cities=30
+number_of_cities=32
 dim=1.
 
-file1 = open("square_city.config","w+")
-file2 = open("circle_city.config","w+")
+file1 = open("square_world.config","w+")
+file2 = open("circle_world.config","w+")
 
 file1.write(str(number_of_cities)+"\n")
 file2.write(str(number_of_cities)+"\n")

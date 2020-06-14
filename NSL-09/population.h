@@ -25,15 +25,22 @@ class Population{
 
 private:
         int population_size;
+        Random* p_rnd;
         std::vector<Chromosome> population;
+        double permutation_probability;
+        double shift_probability;
 public:
         // Constructor
         Population();
         // Destructor
         ~Population();
+        // Copy constructor
+        Population(const Population&);
         // Methods
         void InitializePopulation(int, int, std::vector<city>*, Random*);
+        void SetMutationProbabilities(double, double);
         void SortPopulation();
+        void MutateChromosomes(int, int);
         std::vector<Chromosome> GetPopulation();
 
 };

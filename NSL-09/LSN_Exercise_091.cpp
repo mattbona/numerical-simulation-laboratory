@@ -13,18 +13,22 @@ using namespace std;
 
 int main()
 {
-        // Inizialization
+        // Inizialize
         Input();
-
-        cout << "not sorted:\n";
-        for(int j=0; j<population_size; j++){
-                cout << path_population.GetPopulation()[j].GetPathL1Distance() << endl;
-        }
-        path_population.SortPopulation();
-        cout << "sorted:\n";
-        for(int j=0; j<population_size; j++){
-                cout << path_population.GetPopulation()[j].GetPathL1Distance() << endl;
-        }
+        // Start simulation
+        for(int igeneration=1; igeneration<=number_of_generations; igeneration++){
+                if(igeneration%nprint==0)
+                        cout<<"Generation number: "<<igeneration<<endl;
+                path_population.SortPopulation();
+                for(int j=0; j<population_size; j=j+2){
+                        int k=RiggedRoulette(r, population_size);
+                        int l=RiggedRoulette(r, population_size);
+                        //path_population.CrossoverChromosomes(k, l);
+                        path_population.MutateChromosomes(k, l);
+                };
+                PrintPathL1Distances(path_population,igeneration);
+        };
+        PrintBestPath(path_population);
 
         return 0;
 }
@@ -54,6 +58,9 @@ void Input(void){
         ReadInput.open("input.dat");
         ReadInput >> number_of_generations;
         ReadInput >> population_size;
+        ReadInput >> r;
+        ReadInput >> permutation_probability;
+        ReadInput >> shift_probability;
 
         // Read city positions from world_config.dat
         ReadConfig.open("world_config.dat");
@@ -72,11 +79,57 @@ void Input(void){
         ReadInput.close();
         ReadConfig.close();
 
-        // Create an initial population
+        nprint = number_of_generations/10;
+
+        // Initialize population class
         path_population.InitializePopulation(population_size, number_of_cities,
                                              &world, &rnd);
+        path_population.SetMutationProbabilities(permutation_probability,
+                                                 shift_probability);
 
-}
+};
+// Selection
+int RiggedRoulette(double r, int population_size){
+    return pow(rnd.Rannyu(), r)*population_size;
+};
+void PrintPathL1Distances(Population my_path_population, int igeneration){
+        Population sorted_population;
+        ofstream best_path, average_best_half_path;
+        best_path.open("results/distance_of_best_path.dat",ios::app);
+        average_best_half_path.open("results/average_distance_over_best_half_paths.dat",ios::app);
+
+        sorted_population = my_path_population;
+        sorted_population.SortPopulation();
+
+        best_path << igeneration << " " << sorted_population.GetPopulation()[0].GetPathL1Distance() <<endl;
+
+        double avg_dist=0;
+        for(unsigned int i=0; i<sorted_population.GetPopulation().size()/2; i++){
+                avg_dist += sorted_population.GetPopulation()[i].GetPathL1Distance();
+        }
+        avg_dist /= sorted_population.GetPopulation().size()/2.;
+
+        average_best_half_path << igeneration << " " << avg_dist <<endl;
+
+        best_path.close();
+        average_best_half_path.close();
+};
+void PrintBestPath(Population my_path_population){
+        Population sorted_population;
+        ofstream best_path;
+        best_path.open("results/best_path.dat");
+
+        sorted_population = my_path_population;
+        sorted_population.SortPopulation();
+
+        for(int i=0; i<number_of_cities; i++){
+                int index=sorted_population.GetPopulation()[0].GetPath()[i];
+                best_path << world[index].x << "   " << world[index].y <<endl;
+        }
+        best_path << world[sorted_population.GetPopulation()[0].GetPath()[0]].x << "   " << world[sorted_population.GetPopulation()[0].GetPath()[0]].y <<endl;
+
+        best_path.close();
+};
 
 /****************************************************************
 *****************************************************************

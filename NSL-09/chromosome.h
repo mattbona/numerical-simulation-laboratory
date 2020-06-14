@@ -13,6 +13,7 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <algorithm>    // std::rotate
 #include <cmath>
 #include <cstdlib>
 #include "random.h"
@@ -30,13 +31,17 @@ public:
         Chromosome();
         // Destructor
         ~Chromosome();
+        // Copy constructor
+        Chromosome(const Chromosome&);
         // Methods
         void InitializeChromosome(int, std::vector<city> *, Random *);
-        void PermutePath();
         void CheckPath();
         std::vector<int> GetPath();
         double GetPathL1Distance();
         double GetPathL2Distance();
+        // Mutations
+        void PermutePath();
+        void ShiftPath();
 
 };
 

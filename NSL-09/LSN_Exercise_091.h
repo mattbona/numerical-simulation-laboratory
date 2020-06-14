@@ -22,6 +22,7 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 #include "population.h"
 
 //### Variables
+int nprint=0;
 // Random numbers
 Random rnd;
 
@@ -30,12 +31,18 @@ int number_of_cities;
 std::vector<city> world;
 
 // Genetic Algorithm
-int number_of_generations;
-int population_size;
+int number_of_generations=0;
+int population_size=0;
 Population path_population;
+double r=0;
+double permutation_probability=0;
+double shift_probability=0;
 
 //### Functions
 void Input(void);
+int RiggedRoulette(double, int);
+void PrintPathL1Distances(Population, int);
+void PrintBestPath(Population);
 
 #endif
 

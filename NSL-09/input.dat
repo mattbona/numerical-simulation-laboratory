@@ -1,5 +1,11 @@
+1000
 100
-10
+2.
+0.1
+0.1
 
         ReadInput >> number_of_generations;
         ReadInput >> population_size;
+        ReadInput >> r;
+        ReadInput >> permutation_probability;
+        ReadInput >> shift_probability;

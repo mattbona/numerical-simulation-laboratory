@@ -15,6 +15,13 @@ using namespace std;
 Chromosome :: Chromosome(){};
 // Destructor
 Chromosome :: ~Chromosome(){};
+// Copy constructor
+Chromosome :: Chromosome(const Chromosome& my_chromosome){
+        this->number_of_cities = my_chromosome.number_of_cities;
+        this->p_world = my_chromosome.p_world;
+        this->path = my_chromosome.path;
+        this->p_rnd = my_chromosome.p_rnd;
+};
 // Methods
 void Chromosome :: InitializeChromosome(int my_number_of_cities, std::vector<city> *my_p_world,
                                         Random *my_p_rnd){
@@ -31,20 +38,6 @@ void Chromosome :: InitializeChromosome(int my_number_of_cities, std::vector<cit
         // Check if the created path fulfill the bonds
         this->CheckPath();
 };
-
-void Chromosome :: PermutePath(){
-        // Permute path leaving the first city unchanged
-        vector<int> permuted_path=path;
-
-        int j=p_rnd->Rannyu(1, path.size());
-        int k=p_rnd->Rannyu(1, path.size());
-
-        permuted_path[j]=path[k];
-        permuted_path[k]=path[j];
-
-        path = permuted_path;
-};
-
 void Chromosome :: CheckPath(){
         if(path[0]!=0){
                 cerr<<"Error: path not fulfilling bonds (not starting from the 1^ city)!"<<endl;
@@ -65,11 +58,9 @@ void Chromosome :: CheckPath(){
                 }
         }
 };
-
 std::vector<int> Chromosome :: GetPath(){
         return path;
 };
-
 double Chromosome :: GetPathL1Distance(){
         double l1_distance=0;
         int j=0,k=0;
@@ -86,7 +77,6 @@ double Chromosome :: GetPathL1Distance(){
                                          (*p_world)[j].y, (*p_world)[k].y));
         return l1_distance;
 };
-
 double Chromosome :: GetPathL2Distance(){
         double l2_distance=0;
         int j=0,k=0;
@@ -103,7 +93,27 @@ double Chromosome :: GetPathL2Distance(){
                                     (*p_world)[j].y, (*p_world)[k].y);
         return l2_distance;
 };
+// Mutations
+void Chromosome :: PermutePath(){
+        // Permute path leaving the first city unchanged
+        vector<int> permuted_path=path;
 
+        int j=p_rnd->Rannyu(1, path.size());
+        int k=p_rnd->Rannyu(1, path.size());
+
+        permuted_path[j]=path[k];
+        permuted_path[k]=path[j];
+
+        path = permuted_path;
+};
+void Chromosome :: ShiftPath(){
+        vector<int> shifted_path=path;
+        int index=p_rnd->Rannyu(1, path.size());
+
+        rotate(shifted_path.begin()+1, shifted_path.begin()+index, shifted_path.end());
+
+        path = shifted_path;
+}
 // Functions
 double get_R2_square_norm(double x1, double x2, double y1, double y2){
         return (x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2);
