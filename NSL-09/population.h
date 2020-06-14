@@ -26,11 +26,6 @@ private:
         int population_size;
         Random* p_rnd;
         std::vector<Chromosome> population;
-        double permutation_probability;
-        double block_permutation_probability;
-        double shift_probability;
-        double partial_shift_probability;
-        double inversion_probability;
         double crossover_probability;
 public:
         // Constructor
@@ -44,8 +39,6 @@ public:
         void SetPopulation(std::vector<Chromosome>);
         void InitializePopulation(int, int, std::vector<city>*, Random*);
         void SortPopulation();
-        void SetMutationProbabilities(double, double, double, double, double);
-        std::vector<Chromosome> GetMutatedChromosomes(Chromosome,Chromosome);
         void SetCrossoverProbability(double);
         std::vector<Chromosome> GetCrossoveredChromosomes(int, int);
 };

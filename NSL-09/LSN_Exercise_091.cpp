@@ -19,12 +19,12 @@ int main()
         for(int igeneration=1; igeneration<=number_of_generations; igeneration++){
                 if(igeneration%nprint==0)
                         cout<<"Generation number: "<<igeneration<<endl;
-                path_population.SortPopulation();
+                path_population.SortPopulation(); // Order population for selection
                 for(int j=0; j<population_size; j=j+2){
                         int k=RiggedRoulette(r, population_size);
                         int l=RiggedRoulette(r, population_size);
                         offspring = path_population.GetCrossoveredChromosomes(k, l);
-                        offspring = path_population.GetMutatedChromosomes(offspring[0],offspring[1]);
+                        offspring = GetMutatedChromosomes(offspring[0],offspring[1]);
                         new_path_population[j] = offspring[0];
                         new_path_population[j+1] = offspring[1];
                 };
@@ -92,11 +92,6 @@ void Input(void){
         // Initialize population class
         path_population.InitializePopulation(population_size, number_of_cities,
                                              &world, &rnd);
-        path_population.SetMutationProbabilities(permutation_probability,
-                                                 block_permutation_probability,
-                                                 shift_probability,
-                                                 partial_shift_probability,
-                                                 inversion_probability);
         path_population.SetCrossoverProbability(crossover_probability);
 };
 // Selection
@@ -141,6 +136,42 @@ void PrintBestPath(Population my_path_population){
 
         best_path.close();
 };
+// Mutation
+std::vector<Chromosome> GetMutatedChromosomes(Chromosome my_chromosome1, Chromosome my_chromosome2){
+        vector<Chromosome> mutated_chromosome(2);
+        mutated_chromosome[0] = my_chromosome1;
+        mutated_chromosome[1] = my_chromosome2;
+
+        // Chromosome 1
+        if(rnd.Rannyu() < permutation_probability)
+              mutated_chromosome[0].PermutePath();
+        if(rnd.Rannyu() < block_permutation_probability)
+              mutated_chromosome[0].BlockPermutePath();
+        if(rnd.Rannyu() < shift_probability)
+              mutated_chromosome[0].ShiftPath();
+        if(rnd.Rannyu() < partial_shift_probability)
+              mutated_chromosome[0].PartialShiftPath();
+        if(rnd.Rannyu() < inversion_probability)
+                mutated_chromosome[0].InvertPath();
+        // Chromosome 2
+        if(rnd.Rannyu() < permutation_probability)
+              mutated_chromosome[1].PermutePath();
+        if(rnd.Rannyu() < block_permutation_probability)
+              mutated_chromosome[1].BlockPermutePath();
+        if(rnd.Rannyu() < shift_probability)
+              mutated_chromosome[1].ShiftPath();
+        if(rnd.Rannyu() < partial_shift_probability)
+              mutated_chromosome[1].PartialShiftPath();
+        if(rnd.Rannyu() < inversion_probability)
+                mutated_chromosome[1].InvertPath();
+
+        // Check if mutated paths fullfil the bonds
+        mutated_chromosome[0].CheckPath();
+        mutated_chromosome[1].CheckPath();
+
+        return mutated_chromosome;
+};
+
 /****************************************************************
 *****************************************************************
     _/    _/  _/_/_/  _/       Numerical Simulation Laboratory

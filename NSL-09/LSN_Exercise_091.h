@@ -48,9 +48,9 @@ void Input(void);
 int RiggedRoulette(double, int);
 void PrintPathL1Distances(Population, int);
 void PrintBestPath(Population);
+std::vector<Chromosome> GetMutatedChromosomes(Chromosome,Chromosome);
 
 #endif
-
 /****************************************************************
 *****************************************************************
     _/    _/  _/_/_/  _/       Numerical Simulation Laboratory
