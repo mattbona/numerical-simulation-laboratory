@@ -7,6 +7,9 @@
 _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 *****************************************************************
 *****************************************************************/
+#ifndef __LSN_EXERCISE_102__
+#define __LSN_EXERCISE_102__
+
 #include <iostream>
 #include <fstream>
 #include <ostream>
@@ -38,3 +41,5 @@ void move(void);
 void mutate_path(void);
 void print_distance(double);
 void print_path(void);
+
+#endif

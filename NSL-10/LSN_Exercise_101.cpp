@@ -49,12 +49,12 @@ void input(){
              << "the Traveling Salesman Problem (TSP).   " << endl << endl;
 
         ifstream ReadInput;
-        ReadInput.open("input.dat");
+        ReadInput.open("input_exercise_101.dat");
         if (ReadInput.is_open()){
                 ReadInput >> initial_temperature;
                 ReadInput >> delta_temperature;
                 ReadInput >> mc_steps;
-        } else cerr << "PROBLEM: Unable to open input.dat" << endl;
+        } else cerr << "PROBLEM: Unable to open input_exercise_101.dat" << endl;
 
         cout << "Parameters used:\n";
         cout << "Initial temperature = " << initial_temperature << endl;
@@ -122,7 +122,7 @@ void mutate_path(){
 }
 void print_distance(double my_path_distance){
     ofstream distance;
-    distance.open("results/path_distance.dat",ios::app);
+    distance.open("results/exercise_10.1/path_distance.dat",ios::app);
 
     distance << cont << " " << temperature << " " << my_path_distance << endl;
 
@@ -131,7 +131,7 @@ void print_distance(double my_path_distance){
 }
 void print_path(){
     ofstream my_path;
-    my_path.open("results/path.dat");
+    my_path.open("results/exercise_10.1/path.dat");
 
     for(int i=0; i<number_of_cities; i++){
             int index=path.GetPath()[i];
