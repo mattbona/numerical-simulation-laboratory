@@ -33,6 +33,7 @@ std::vector<city> world;
 
 // Genetic Algorithm
 int number_of_generations=0;
+int number_of_migrations=0, nmigration=0;
 int population_size=0;
 Population path_population;
 std::vector<Chromosome> new_path_population, offspring(2);
@@ -44,11 +45,15 @@ double partial_shift_probability=0;
 double inversion_probability=0;
 double crossover_probability=0;
 
+// MPI Variables
+int node_rank, number_of_nodes;
+
 //### Functions
 void Input(void);
 int RiggedRoulette(double, int);
 void PrintPathL1Distances(Population, int);
 void PrintBestPath(Population);
+Population GetMigratedPopulation(Population);
 std::vector<Chromosome> GetMutatedChromosomes(Chromosome,Chromosome);
 
 #endif

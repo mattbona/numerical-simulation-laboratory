@@ -21,6 +21,8 @@ int main(int argc, char* argv[])
                 if(igeneration%nprint==0)
                         cout<<"Generation number: "<<igeneration<<endl;
                 path_population.SortPopulation(); // Order population for selection
+                if(igeneration%nmigration==0)
+                        path_population = GetMigratedPopulation(path_population);
                 for(int j=0; j<population_size; j=j+2){
                         int k=RiggedRoulette(r, population_size);
                         int l=RiggedRoulette(r, population_size);
@@ -40,28 +42,37 @@ int main(int argc, char* argv[])
 
 //### Functions
 void Input(void){
+        MPI_Comm_rank(MPI_COMM_WORLD, &node_rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &number_of_nodes);
+
         int seed[4];
-        int p1, p2;
+        int* p1 = new int[number_of_nodes]();
+        int* p2 = new int[number_of_nodes]();
         ifstream Primes("Primes");
-        if (Primes.is_open()){
-            Primes >> p1 >> p2 ;
-        } else cerr << "PROBLEM: Unable to open Primes" << endl;
+        for(int irank=0; irank<number_of_nodes; irank++){
+                if (Primes.is_open()){
+                    Primes >> p1[irank] >> p2[irank];
+                } else cerr << "PROBLEM: Unable to open Primes" << endl;
+        }
         Primes.close();
 
         ifstream input("seed.in");
         if (input.is_open()){
                     input >> seed[0] >> seed[1] >> seed[2] >> seed[3];
-                    rnd.SetRandom(seed,p1,p2);
+                    rnd.SetRandom(seed,p1[node_rank],p2[node_rank]);
                     input.close();
         } else cerr << "PROBLEM: Unable to open seed.in" << endl;
 
-        cout << "Solving the Traveling Salesman Problem (TSP)" << endl;
-        cout << "via a Genetic Algorithm.                    " << endl << endl;
+        if(node_rank==0){
+                cout << "Solving the Traveling Salesman Problem (TSP)      " << endl;
+                cout << "via a Genetic Algorithm in a parallelized fashion." << endl << endl;
+        }
 
         ifstream ReadInput, ReadConfig;
         //Read informations from input_exercise_102.dat
         ReadInput.open("input_exercise_102.dat");
         ReadInput >> number_of_generations;
+        ReadInput >> number_of_migrations;
         ReadInput >> population_size;
         ReadInput >> r;
         ReadInput >> permutation_probability;
@@ -79,15 +90,20 @@ void Input(void){
                 ReadConfig >> world[i].y;
         }
 
-        cout << "Simulation parameters: " << endl;
-        cout << "Number of generations = " << number_of_generations << endl;
-        cout << "Population size = " << population_size << endl;
-        cout << "Number of cities = " << number_of_cities << endl<<endl;
+        if(node_rank==0){
+                cout << "Simulation parameters: " << endl;
+                cout << "Number of cores used = " << number_of_nodes << endl;
+                cout << "Number of migrations = " << number_of_migrations << endl;
+                cout << "Number of generations (per core) = " << number_of_generations << endl;
+                cout << "Population size (per core) = " << population_size << endl;
+                cout << "Number of cities = " << number_of_cities << endl<<endl;
+        }
 
         ReadInput.close();
         ReadConfig.close();
 
         nprint = number_of_generations/10;
+        nmigration = number_of_generations/number_of_migrations;
 
         // Initialize empty population vector
         new_path_population.resize(population_size);
@@ -103,8 +119,8 @@ int RiggedRoulette(double r, int population_size){
 void PrintPathL1Distances(Population my_path_population, int igeneration){
         Population sorted_population;
         ofstream best_path, average_best_half_path;
-        best_path.open("results/exercise_10.2/distance_of_best_path.dat",ios::app);
-        average_best_half_path.open("results/exercise_10.2/average_distance_over_best_half_paths.dat",ios::app);
+        best_path.open("results/exercise_10.2/distance_of_best_path_node"+to_string(node_rank)+".dat",ios::app);
+        average_best_half_path.open("results/exercise_10.2/average_distance_over_best_half_paths_node"+to_string(node_rank)+".dat",ios::app);
 
         sorted_population = my_path_population;
         sorted_population.SortPopulation();
@@ -125,7 +141,7 @@ void PrintPathL1Distances(Population my_path_population, int igeneration){
 void PrintBestPath(Population my_path_population){
         Population sorted_population;
         ofstream best_path;
-        best_path.open("results/exercise_10.2/best_path.dat");
+        best_path.open("results/exercise_10.2/best_path_node"+to_string(node_rank)+".dat");
 
         sorted_population = my_path_population;
         sorted_population.SortPopulation();
@@ -137,6 +153,33 @@ void PrintBestPath(Population my_path_population){
         best_path << world[sorted_population.GetPopulation()[0].GetPath()[0]].x << "   " << world[sorted_population.GetPopulation()[0].GetPath()[0]].y <<endl;
 
         best_path.close();
+};
+Population GetMigratedPopulation(Population my_path_population){
+        Population sorted_population = my_path_population;
+        sorted_population.SortPopulation();
+        std::vector<int> best_path_node = sorted_population.GetPopulation()[0].GetPath();
+        int  best_path_node_size =  best_path_node.size();
+
+        std::vector<int> best_path_all_node;
+        int best_path_all_node_size = best_path_node_size*number_of_nodes;
+        best_path_all_node.resize(best_path_all_node_size);
+
+        MPI_Allgather(&best_path_node[0], best_path_node_size ,MPI_INT,
+                      &best_path_all_node[0], best_path_node_size ,MPI_INT,
+                      MPI_COMM_WORLD);
+
+        int jnode = rnd.Rannyu(0,4);
+        std::vector<int> path_jnode(number_of_cities);
+        if(node_rank==jnode){
+                while(node_rank==jnode)     jnode = rnd.Rannyu(0,4);
+        }
+        for(int i=0; i<number_of_cities; i++){
+                int k = i + jnode*number_of_nodes;
+                path_jnode[i] = best_path_all_node[k];
+        }
+        sorted_population.GetPopulation()[0].SetPath(path_jnode);
+
+        return sorted_population;
 };
 // Mutation
 std::vector<Chromosome> GetMutatedChromosomes(Chromosome my_chromosome1, Chromosome my_chromosome2){

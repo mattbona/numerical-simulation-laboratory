@@ -1,4 +1,5 @@
 2000
+500
 100
 2.0
 0.1
@@ -9,6 +10,7 @@
 0.8
 
         ReadInput >> number_of_generations;
+        ReadInput >> migration_number;
         ReadInput >> population_size;
         ReadInput >> r;
         ReadInput >> permutation_probability;
