@@ -37,6 +37,7 @@ public:
         // Methods
         std::vector<Chromosome> GetPopulation();
         void SetPopulation(std::vector<Chromosome>);
+        void SetChromosomePath(int, std::vector<int>);
         void InitializePopulation(int, int, std::vector<city>*, Random*);
         void SortPopulation();
         void SetCrossoverProbability(double);

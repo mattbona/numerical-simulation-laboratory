@@ -29,6 +29,9 @@ std::vector<Chromosome> Population :: GetPopulation(){
 void Population :: SetPopulation(std::vector<Chromosome> my_population){
         this->population = my_population;
 };
+void Population :: SetChromosomePath(int my_ichromosome, std::vector<int> my_path){
+        this->population[my_ichromosome].SetPath(my_path);
+}
 void Population :: InitializePopulation(int my_population_size, int my_number_of_cities,
                                         std::vector<city> *my_p_world, Random *my_p_rnd){
         this->population_size = my_population_size;

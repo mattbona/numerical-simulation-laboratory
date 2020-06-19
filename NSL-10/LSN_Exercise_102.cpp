@@ -18,11 +18,13 @@ int main(int argc, char* argv[])
         Input();
         // Start simulation
         for(int igeneration=1; igeneration<=number_of_generations; igeneration++){
-                if(igeneration%nprint==0)
-                        cout<<"Generation number: "<<igeneration<<endl;
+                if(node_rank==0){
+                        if(igeneration%nprint==0)
+                                cout<<"Generation number: "<<igeneration<<endl;
+                }
                 path_population.SortPopulation(); // Order population for selection
                 if(igeneration%nmigration==0)
-                        path_population = GetMigratedPopulation(path_population);
+                        path_population = GetMigratedPopulation(path_population); // Migrate best path
                 for(int j=0; j<population_size; j=j+2){
                         int k=RiggedRoulette(r, population_size);
                         int l=RiggedRoulette(r, population_size);
@@ -174,10 +176,10 @@ Population GetMigratedPopulation(Population my_path_population){
                 while(node_rank==jnode)     jnode = rnd.Rannyu(0,4);
         }
         for(int i=0; i<number_of_cities; i++){
-                int k = i + jnode*number_of_nodes;
+                int k = i + jnode*number_of_cities;
                 path_jnode[i] = best_path_all_node[k];
         }
-        sorted_population.GetPopulation()[0].SetPath(path_jnode);
+        sorted_population.SetChromosomePath(0,path_jnode);
 
         return sorted_population;
 };
