@@ -45,3 +45,7 @@ All the jupyter notebooks relative to the exercises are found in `NSL-*/notebook
 * NSL-10:
 	- EX 10.1
 	- EX 10.2
+* NSL-11:
+	- EX 11.1
+	- EX 11.2
+	- EX 11.3
